@@ -13,6 +13,11 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
+
+
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -25,8 +30,9 @@
 #include <algorithm> // std::clamp
 #include <fstream>
 #include <array>
-
+#include <unordered_map>
 #include <chrono>
+#include <thread>
 
 struct Vertex {
 	glm::vec3 pos;
@@ -58,7 +64,21 @@ struct Vertex {
 		attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
 		return attributeDescriptions;
 	}
+
+	bool operator == (const Vertex& other) const {
+		return pos == other.pos && color == other.color && texCoord == other.texCoord;
+	}
 };
+
+namespace std {
+	template <> struct hash<Vertex> {
+		size_t operator()(Vertex const& vertex) const {
+			return ((hash<glm::vec3>()(vertex.pos) ^
+				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+				(hash<glm::vec2>()(vertex.texCoord) << 1);
+		}
+	};
+}
 //const std::vector<Vertex> vertices = {
 //	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 //	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -81,6 +101,7 @@ struct UniformBufferObject {
 };
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
+const int MAX_FPS = 100;
 
 static std::vector<char> readFile(const std::string& filename) {
 	std::ifstream file(filename, (std::ios::ate) | (std::ios::binary));
@@ -265,15 +286,6 @@ private:
 		VkInstanceCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 		createInfo.pApplicationInfo = &appInfo;
-		////VALIDATION LAYERS INFO
-		//if (enableValidationLayers) {
-		//	createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-		//	createInfo.ppEnabledLayerNames = validationLayers.data();
-		//}
-		//else {
-		//	createInfo.enabledLayerCount = 0;
-		//}
-		//extensions
 		auto extensions = getRequiredExtensions();
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
@@ -333,6 +345,8 @@ private:
 			throw std::runtime_error(warn + err);
 		}
 
+		std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+
 		for (const auto& shape : shapes) {
 			for (const auto& index : shape.mesh.indices) {
 				Vertex vertex{};
@@ -347,8 +361,14 @@ private:
 				};
 				vertex.color = { 1.0f, 1.0f, 1.0f };
 
-				vertices.push_back(vertex);
-				indices.push_back(indices.size());
+				//vertices.push_back(vertex);
+
+				if (uniqueVertices.count(vertex) == 0) {
+					uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+					vertices.push_back(vertex);
+				}
+				indices.push_back(uniqueVertices[vertex]);
+
 			}
 		}
 	}
@@ -1459,6 +1479,8 @@ private:
 
 	uint32_t currentFrame = 0;
 	void drawFrame() {
+		auto frameStartTime = std::chrono::high_resolution_clock::now();
+
 		vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 		
 
@@ -1506,6 +1528,10 @@ private:
 		presentInfo.pImageIndices = &imageIndex;
 		presentInfo.pResults = nullptr;
 		result = vkQueuePresentKHR(presentQueue, &presentInfo);
+		auto frameEndTime = std::chrono::high_resolution_clock::now();
+		float time = std::chrono::duration<float>(frameEndTime - frameStartTime).count();
+		//std::cout << int((1.0f / MAX_FPS - float(time))*1000) << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(int((1.0f / MAX_FPS - float(time)) * 1000)));
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
 			framebufferResized = false;
 			recreateSwapChain();
@@ -1514,6 +1540,8 @@ private:
 			throw std::runtime_error("failed to present swap chain image!");
 		}
 		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		
+		
 	}
 	void updateUniformBuffer(uint32_t currentImage) {
 		static auto startTime = std::chrono::high_resolution_clock::now();
@@ -1522,7 +1550,7 @@ private:
 		float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 		UniformBufferObject ubo{};
-		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
 		ubo.proj[1][1] *= -1;
