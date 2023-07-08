@@ -18,8 +18,6 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
 
-#include "Application.h"
-
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -109,8 +107,8 @@ static std::vector<char> readFile(const std::string& filename) {
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-const std::string MODEL_PATH = "models/trunk.obj";
-const std::string TEXTURE_PATH = "textures/trunk.jpg";
+const std::string MODEL_PATH = "models/tommy.obj";
+const std::string TEXTURE_PATH = "textures/tommy.png";
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -1335,7 +1333,6 @@ private:
 		std::vector<VkSurfaceFormatKHR> formats;
 		std::vector<VkPresentModeKHR> presentModes;
 	};
-
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device) {
 		SwapChainSupportDetails details;
 
@@ -1588,20 +1585,7 @@ private:
 };
 
 int main() {
-
-	Application app;
-
-	try {
-		app.run();
-	}
-	catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
-
-	/*HelloTriangleApplication app;
+	HelloTriangleApplication app;
 
 	try {
 		app.run();
@@ -1609,7 +1593,7 @@ int main() {
 	catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
-	}*/
+	}
 
 	return EXIT_SUCCESS;
 }
