@@ -14,7 +14,7 @@ public:
 	appWindow& operator=(const appWindow&);
 
 	bool shouldClose() { return glfwWindowShouldClose(Window); }
-	void createWindowSurface(VkInstance instance, VkSurfaceKHR surface);
+	void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 private:
 	void initWindow();
 	const uint32_t width;

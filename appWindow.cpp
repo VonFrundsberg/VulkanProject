@@ -12,9 +12,9 @@ appWindow::~appWindow() {
 	glfwTerminate();
 }
 
-void appWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR surface)
+void appWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface)
 {
-	if (glfwCreateWindowSurface(instance, Window, nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, Window, nullptr, surface) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create window surface!");
 	}
 }
