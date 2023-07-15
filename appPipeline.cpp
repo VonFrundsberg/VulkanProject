@@ -8,17 +8,19 @@
 
 namespace appNamespace {
 	appPipeline::appPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
-		appDevice& device) : AppDevice{ device }
+		appDevice& device, const pipelineConfigInfo& configInfo) : AppDevice{ device }
 	{
-		createGraphicsPipeline(vertFilePath, fragFilePath);
+		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
 	appPipeline::~appPipeline() {
 		vkDestroyShaderModule(AppDevice.device(), VertShaderModule, nullptr);
 		vkDestroyShaderModule(AppDevice.device(), FragShaderModule, nullptr);
 		vkDestroyPipeline(AppDevice.device(), GraphicsPipeline, nullptr);
 	}
-	void appPipeline::defaultPipelineConfigInfo(pipelineConfigInfo &configInfo, uint32_t width, uint32_t height)
+	pipelineConfigInfo appPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
 	{
+		pipelineConfigInfo configInfo{};
+
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
@@ -32,12 +34,6 @@ namespace appNamespace {
 
 		configInfo.scissor.offset = { 0, 0 };
 		configInfo.scissor.extent = { width, height};
-
-		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-		configInfo.viewportInfo.viewportCount = 1;
-		configInfo.viewportInfo.pViewports = &configInfo.viewport;
-		configInfo.viewportInfo.scissorCount = 1;
-		configInfo.viewportInfo.pScissors = &configInfo.scissor;
 
 		configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 		configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
@@ -70,16 +66,6 @@ namespace appNamespace {
 		configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
 		configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
 
-		configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-		configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
-		configInfo.colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
-		configInfo.colorBlendInfo.attachmentCount = 1;
-		configInfo.colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
-		configInfo.colorBlendInfo.blendConstants[0] = 0.0f;  // Optional
-		configInfo.colorBlendInfo.blendConstants[1] = 0.0f;  // Optional
-		configInfo.colorBlendInfo.blendConstants[2] = 0.0f;  // Optional
-		configInfo.colorBlendInfo.blendConstants[3] = 0.0f;  // Optional
-
 		configInfo.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 		configInfo.depthStencilInfo.depthTestEnable = VK_TRUE;
 		configInfo.depthStencilInfo.depthWriteEnable = VK_TRUE;
@@ -90,6 +76,8 @@ namespace appNamespace {
 		configInfo.depthStencilInfo.stencilTestEnable = VK_FALSE;
 		configInfo.depthStencilInfo.front = {};  // Optional
 		configInfo.depthStencilInfo.back = {};   // Optional
+
+		return configInfo;
 	}
 
 	std::vector<char> appPipeline::readFile(const std::string& filePath)
@@ -108,17 +96,15 @@ namespace appNamespace {
 
 		return buffer;
 	}
-	void appPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath)
+	void appPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo)
 	{
-		pipelineConfigInfo configInfo = {};
-		defaultPipelineConfigInfo(configInfo, 800, 600); //WATCH OUT FOR NUMBERS
-		assert(
+		/*assert(
 			configInfo.pipelineLayout != VK_NULL_HANDLE &&
 			"Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
 
 		assert(
 			configInfo.renderPass != VK_NULL_HANDLE &&
-			"Cannot create graphics pipeline: no renderPass provided in configInfo");
+			"Cannot create graphics pipeline: no renderPass provided in configInfo");*/
 
 		
 
@@ -152,16 +138,36 @@ namespace appNamespace {
 		vertexInputInfo.pVertexAttributeDescriptions = nullptr; //CHANGE
 		vertexInputInfo.pVertexBindingDescriptions = nullptr; //CHANGE
 
+
+		VkPipelineViewportStateCreateInfo viewportInfo{};
+		viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+		viewportInfo.viewportCount = 1;
+		viewportInfo.pViewports = &configInfo.viewport;
+		viewportInfo.scissorCount = 1;
+		viewportInfo.pScissors = &configInfo.scissor;
+
+
+		VkPipelineColorBlendStateCreateInfo colorBlendInfo{};
+		colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+		colorBlendInfo.logicOpEnable = VK_FALSE;
+		colorBlendInfo.logicOp = VK_LOGIC_OP_COPY;  // Optional
+		colorBlendInfo.attachmentCount = 1;
+		colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
+		colorBlendInfo.blendConstants[0] = 0.0f;  // Optional
+		colorBlendInfo.blendConstants[1] = 0.0f;  // Optional
+		colorBlendInfo.blendConstants[2] = 0.0f;  // Optional
+		colorBlendInfo.blendConstants[3] = 0.0f;  // Optional
+
 		VkGraphicsPipelineCreateInfo pipelineInfo{};
 		pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 		pipelineInfo.stageCount = 2;
 		pipelineInfo.pStages = shaderStages;
 		pipelineInfo.pVertexInputState = &vertexInputInfo;
 		pipelineInfo.pInputAssemblyState = &configInfo.inputAssemblyInfo;
-		pipelineInfo.pViewportState = &configInfo.viewportInfo;
+		pipelineInfo.pViewportState = &viewportInfo;
 		pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
 		pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
-		pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
+		pipelineInfo.pColorBlendState = &colorBlendInfo;
 		pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
 		pipelineInfo.pDynamicState = nullptr;
 
@@ -171,7 +177,6 @@ namespace appNamespace {
 		
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-		std::cout << "width is: " << configInfo.viewportInfo.pViewports->width;
 		if (vkCreateGraphicsPipelines(AppDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &GraphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("graphics pipeline failed to be created!");
 		}

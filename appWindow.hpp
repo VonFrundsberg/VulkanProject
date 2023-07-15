@@ -14,6 +14,7 @@ namespace appNamespace {
 		appWindow& operator=(const appWindow&);
 
 		bool shouldClose() { return glfwWindowShouldClose(Window); }
+		VkExtent2D getExtent() { return { width, height }; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 	private:
 		void initWindow();

@@ -14,6 +14,7 @@ namespace appNamespace {
 		appWindow Window{ WIDTH, HEIGHT, "Application name" };
 		appDevice AppDevice{ Window };
 		pipelineConfigInfo configInfo{};
-		appPipeline appPipeline{ "shaders/vert.spv", "shaders/frag.spv", AppDevice};
+		appPipeline appPipeline{ "shaders/vert.spv", "shaders/frag.spv", AppDevice,
+			appPipeline::defaultPipelineConfigInfo(HEIGHT, WIDTH)};
 	};
 };
