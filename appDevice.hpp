@@ -4,22 +4,22 @@
 // std lib headers
 #include <string>
 #include <vector>
+namespace appNamespace {
+	struct SwapChainSupportDetails {
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
+	};
 
-struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
-struct QueueFamilyIndices {
+	struct QueueFamilyIndices {
 		uint32_t graphicsFamily;
 		uint32_t presentFamily;
 		bool graphicsFamilyHasValue = false;
 		bool presentFamilyHasValue = false;
 		bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
-};
+	};
 
-class appDevice {
+	class appDevice {
 	public:
 #ifdef NDEBUG
 		const bool enableValidationLayers = false;
@@ -68,8 +68,8 @@ class appDevice {
 
 		VkPhysicalDeviceProperties properties;
 
-		private:
-			VkDevice device_;
+	private:
+		VkDevice device_;
 		void createInstance();
 		void setupDebugMessenger();
 		void createSurface();
@@ -93,7 +93,7 @@ class appDevice {
 		appWindow& window;
 		VkCommandPool commandPool;
 
-		
+
 		VkSurfaceKHR surface_;
 		VkQueue graphicsQueue_;
 		VkQueue presentQueue_;
@@ -101,3 +101,4 @@ class appDevice {
 		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
 		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 	};
+};

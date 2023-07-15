@@ -1,9 +1,10 @@
 #include "Application.h"
 #include <iostream>
 
+
 int main() {
 
-	Application app;
+	appNamespace::Application app;
 
 	try {
 		app.run();
