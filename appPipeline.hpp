@@ -17,14 +17,14 @@ namespace appNamespace {
 		VkRenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
 	};
-	class appPipeline {
+	class AppPipeline {
 	public:
-		appPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
+		AppPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
 			appDevice& device, const pipelineConfigInfo& configInfo);
-		~appPipeline();
+		~AppPipeline();
 
-		appPipeline(const appPipeline&) = delete;
-		void operator=(const appPipeline&) = delete;
+		AppPipeline(const AppPipeline&) = delete;
+		void operator=(const AppPipeline&) = delete;
 
 		static pipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
 

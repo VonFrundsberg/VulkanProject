@@ -11,7 +11,7 @@ namespace appNamespace {
 		~appWindow();
 
 		appWindow(const appWindow&) = delete;
-		appWindow& operator=(const appWindow&);
+		appWindow& operator=(const appWindow&) = delete;
 
 		bool shouldClose() { return glfwWindowShouldClose(Window); }
 		VkExtent2D getExtent() { return { width, height }; }

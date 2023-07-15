@@ -7,17 +7,17 @@
 #define assertm(exp, msg) assert(((void)msg, exp))
 
 namespace appNamespace {
-	appPipeline::appPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
+	AppPipeline::AppPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
 		appDevice& device, const pipelineConfigInfo& configInfo) : AppDevice{ device }
 	{
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
-	appPipeline::~appPipeline() {
+	AppPipeline::~AppPipeline() {
 		vkDestroyShaderModule(AppDevice.device(), VertShaderModule, nullptr);
 		vkDestroyShaderModule(AppDevice.device(), FragShaderModule, nullptr);
 		vkDestroyPipeline(AppDevice.device(), GraphicsPipeline, nullptr);
 	}
-	pipelineConfigInfo appPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
+	pipelineConfigInfo AppPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
 	{
 		pipelineConfigInfo configInfo{};
 
@@ -80,7 +80,7 @@ namespace appNamespace {
 		return configInfo;
 	}
 
-	std::vector<char> appPipeline::readFile(const std::string& filePath)
+	std::vector<char> AppPipeline::readFile(const std::string& filePath)
 	{
 		std::ifstream file(filePath, (std::ios::ate) | (std::ios::binary));
 		if (!file.is_open()) {
@@ -96,7 +96,7 @@ namespace appNamespace {
 
 		return buffer;
 	}
-	void appPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo)
+	void AppPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo)
 	{
 		/*assert(
 			configInfo.pipelineLayout != VK_NULL_HANDLE &&
@@ -182,7 +182,7 @@ namespace appNamespace {
 		}
 
 	}
-	void appPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
+	void AppPipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule)
 	{
 		VkShaderModuleCreateInfo createInfo{};
 		createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
