@@ -17,6 +17,9 @@ namespace appNamespace {
 		vkDestroyShaderModule(AppDevice.device(), FragShaderModule, nullptr);
 		vkDestroyPipeline(AppDevice.device(), GraphicsPipeline, nullptr);
 	}
+	void AppPipeline::bind(VkCommandBuffer commandBuffer){
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline);
+	}
 	pipelineConfigInfo AppPipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height)
 	{
 		pipelineConfigInfo configInfo{};
