@@ -12,7 +12,8 @@ namespace appNamespace {
 		vkDeviceWaitIdle(appDevice.device());
 	}
 	Application::Application()
-	{
+	{	
+		loadModels();
 		createPipelineLayout();
 		createPipeline();
 		createCommandBuffers();
@@ -20,6 +21,14 @@ namespace appNamespace {
 	Application::~Application()
 	{
 		vkDestroyPipelineLayout(appDevice.device(), pipelineLayout, nullptr);
+	}
+	void Application::loadModels(){
+		std::vector<AppModel::Vertex> vertices{
+			{{0.0f, -0.5f, 1.0f}},
+			{{0.5f, 0.5f, 1.0f}},
+			{{-0.5f, 0.5f, 1.0f}}
+		};
+		appModel = std::make_unique<AppModel>(appDevice, vertices);
 	}
 	void Application::createPipelineLayout()
 	{
@@ -76,7 +85,8 @@ namespace appNamespace {
 
 			vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 			appPipeline->bind(commandBuffers[i]);
-			vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+			appModel->bind(commandBuffers[i]);
+			appModel->draw(commandBuffers[i]);
 
 			vkCmdEndRenderPass(commandBuffers[i]);
 			if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {

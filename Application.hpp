@@ -4,7 +4,7 @@
 #include "appPipeline.hpp"
 #include "appDevice.hpp"
 #include "appSwapChain.hpp"
-
+#include "appModel.hpp"
 #include <memory>
 #include <vector>
 
@@ -23,12 +23,15 @@ namespace appNamespace {
 
 	private:
 		appWindow window{ WIDTH, HEIGHT, "Application name" };
-		appDevice appDevice{ window };
+		AppDevice appDevice{ window };
 		appSwapChain appSwapChain{ appDevice, window.getExtent() };
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
+		std::unique_ptr<AppModel> appModel;  
 
+
+		void loadModels();
 		void createPipelineLayout();
 		void createPipeline();
 		void createCommandBuffers();

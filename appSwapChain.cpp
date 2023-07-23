@@ -11,7 +11,7 @@
 
 namespace appNamespace {
 
-    appSwapChain::appSwapChain(appDevice& deviceRef, VkExtent2D extent)
+    appSwapChain::appSwapChain(AppDevice& deviceRef, VkExtent2D extent)
         : device{ deviceRef }, windowExtent{ extent } {
         createSwapChain();
         createImageViews();

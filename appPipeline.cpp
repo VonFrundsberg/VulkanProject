@@ -1,4 +1,5 @@
 #include "appPipeline.hpp"
+#include "appModel.hpp"
 #include <fstream>
 #include <iostream>
 #include <cassert>
@@ -8,14 +9,17 @@
 
 namespace appNamespace {
 	AppPipeline::AppPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
-		appDevice& device, const pipelineConfigInfo& configInfo) : AppDevice{ device }
+		AppDevice& device, const pipelineConfigInfo& configInfo) : appDevice{ device }
 	{
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
+
+
+
 	AppPipeline::~AppPipeline() {
-		vkDestroyShaderModule(AppDevice.device(), VertShaderModule, nullptr);
-		vkDestroyShaderModule(AppDevice.device(), FragShaderModule, nullptr);
-		vkDestroyPipeline(AppDevice.device(), GraphicsPipeline, nullptr);
+		vkDestroyShaderModule(appDevice.device(), VertShaderModule, nullptr);
+		vkDestroyShaderModule(appDevice.device(), FragShaderModule, nullptr);
+		vkDestroyPipeline(appDevice.device(), GraphicsPipeline, nullptr);
 	}
 	void AppPipeline::bind(VkCommandBuffer commandBuffer){
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline);
@@ -134,12 +138,16 @@ namespace appNamespace {
 		shaderStages[1].pNext = nullptr;
 		shaderStages[1].pSpecializationInfo = nullptr;
 
+
+		auto bindingDescriptions = AppModel::Vertex::getBindingDescriptions();
+		auto attributeDesriptions = AppModel::Vertex::getAtrributeDescriptions();
+
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-		vertexInputInfo.vertexAttributeDescriptionCount = 0;	//CHANGE
-		vertexInputInfo.vertexBindingDescriptionCount = 0; //CHANGE
-		vertexInputInfo.pVertexAttributeDescriptions = nullptr; //CHANGE
-		vertexInputInfo.pVertexBindingDescriptions = nullptr; //CHANGE
+		vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDesriptions.size());
+		vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size()); 
+		vertexInputInfo.pVertexAttributeDescriptions = attributeDesriptions.data();
+		vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
 
 		VkPipelineViewportStateCreateInfo viewportInfo{};
@@ -180,7 +188,7 @@ namespace appNamespace {
 		
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-		if (vkCreateGraphicsPipelines(AppDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &GraphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(appDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &GraphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("graphics pipeline failed to be created!");
 		}
 
@@ -194,7 +202,7 @@ namespace appNamespace {
 		createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 		createInfo.flags = 0;
 
-		if (vkCreateShaderModule(AppDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+		if (vkCreateShaderModule(appDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create shader module!");
 		}
 	}

@@ -19,7 +19,7 @@ namespace appNamespace {
 		bool isComplete() { return graphicsFamilyHasValue && presentFamilyHasValue; }
 	};
 
-	class appDevice {
+	class AppDevice {
 	public:
 #ifdef NDEBUG
 		const bool enableValidationLayers = false;
@@ -27,13 +27,13 @@ namespace appNamespace {
 		const bool enableValidationLayers = true;
 #endif
 
-		appDevice(appWindow& window);
-		~appDevice();
+		AppDevice(appWindow& window);
+		~AppDevice();
 		// Not copyable or movable
-		appDevice(const appDevice&) = delete;
-		void operator=(const appDevice&) = delete;
-		appDevice(appDevice&&) = delete;
-		appDevice& operator=(appDevice&&) = delete;
+		AppDevice(const AppDevice&) = delete;
+		void operator=(const AppDevice&) = delete;
+		AppDevice(AppDevice&&) = delete;
+		AppDevice& operator=(AppDevice&&) = delete;
 
 		VkCommandPool getCommandPool() { return commandPool; }
 		VkDevice device() { return device_; }

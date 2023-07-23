@@ -20,7 +20,7 @@ namespace appNamespace {
 	class AppPipeline {
 	public:
 		AppPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
-			appDevice& device, const pipelineConfigInfo& configInfo);
+			AppDevice& device, const pipelineConfigInfo& configInfo);
 		~AppPipeline();
 
 		AppPipeline(const AppPipeline&) = delete;
@@ -35,7 +35,7 @@ namespace appNamespace {
 		void createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo);
 		
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
-		appDevice& AppDevice;
+		AppDevice& appDevice;
 		VkPipeline GraphicsPipeline;
 		VkShaderModule VertShaderModule;
 		VkShaderModule FragShaderModule;

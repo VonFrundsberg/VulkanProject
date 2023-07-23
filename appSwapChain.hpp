@@ -15,7 +15,7 @@ namespace appNamespace {
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-        appSwapChain(appDevice& deviceRef, VkExtent2D windowExtent);
+        appSwapChain(AppDevice& deviceRef, VkExtent2D windowExtent);
         ~appSwapChain();
 
         appSwapChain(const appSwapChain&) = delete;
@@ -65,7 +65,7 @@ namespace appNamespace {
         std::vector<VkImage> swapChainImages;
         std::vector<VkImageView> swapChainImageViews;
 
-        appDevice& device;
+        AppDevice& device;
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
