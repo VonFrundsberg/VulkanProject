@@ -24,9 +24,9 @@ namespace appNamespace {
 	}
 	void Application::loadModels(){
 		std::vector<AppModel::Vertex> vertices{
-			{{0.0f, -0.5f, 1.0f}},
-			{{0.5f, 0.5f, 1.0f}},
-			{{-0.5f, 0.5f, 1.0f}}
+			{{0.0f, -0.5f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}
 		};
 		appModel = std::make_unique<AppModel>(appDevice, vertices);
 	}

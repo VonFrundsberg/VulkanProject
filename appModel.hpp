@@ -10,6 +10,7 @@ namespace appNamespace {
 	public:
 		struct Vertex {
 			glm::vec3 position;
+			glm::vec3 color;
 
 			static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
 			static std::vector<VkVertexInputAttributeDescription> getAtrributeDescriptions();
