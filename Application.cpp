@@ -47,7 +47,7 @@ namespace appNamespace {
 		auto pipelineConfig = AppPipeline::defaultPipelineConfigInfo(appSwapChain.width(), appSwapChain.height());
 		pipelineConfig.renderPass = appSwapChain.getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		appPipeline = std::make_unique<AppPipeline>("shaders/vert.spv", "shaders/frag.spv", appDevice, pipelineConfig);
+		appPipeline = std::make_unique<AppPipeline>("/Users/victor/Users/victor/Documents/XcodeProjects/VulkanTesting/VulkanTesting/VulkanProject/shaders/vert.spv", "/Users/victor/Users/victor/Documents/XcodeProjects/VulkanTesting/VulkanTesting/VulkanProject/shaders/frag.spv", appDevice, pipelineConfig);
 	}
 	void Application::createCommandBuffers(){
 		commandBuffers.resize(appSwapChain.imageCount());
