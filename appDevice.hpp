@@ -1,5 +1,6 @@
 #pragma once
 #include "appWindow.hpp"
+#define SECOND_LITTLE_PROBLEM "VK_KHR_portability_subset"
 
 // std lib headers
 #include <string>
@@ -99,6 +100,6 @@ namespace appNamespace {
 		VkQueue presentQueue_;
 
 		const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
-		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
+		const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, SECOND_LITTLE_PROBLEM };
 	};
 };
