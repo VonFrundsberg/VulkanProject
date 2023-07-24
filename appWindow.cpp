@@ -2,28 +2,39 @@
 #include <iostream>
 
 namespace appNamespace {
-	appWindow::appWindow(uint32_t width, uint32_t height, std::string windowName) : width{ width }, height{ height }, WindowName{ windowName }
+	AppWindow::AppWindow(int width, int height, std::string windowName) : width{ width }, height{ height }, WindowName{ windowName }
 	{
 		initWindow();
 	}
 
-	appWindow::~appWindow() {
-		glfwDestroyWindow(Window);
+	AppWindow::~AppWindow() {
+		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
 
-	void appWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
+	void AppWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface)
 	{
-		if (glfwCreateWindowSurface(instance, Window, nullptr, surface) != VK_SUCCESS) {
+		if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create window surface!");
 		}
 	}
 
-	void appWindow::initWindow() {
+	void AppWindow::framebufferResizeCallback(GLFWwindow* window, int width, int height)
+	{
+		auto appWindow = reinterpret_cast<AppWindow*>(glfwGetWindowUserPointer(window));
+		appWindow->framebufferResized = true;
+		appWindow->width = width;
+		appWindow->height = height;
+	}
+
+	void AppWindow::initWindow() {
 		glfwInit();
 
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); 
 
-		Window = glfwCreateWindow(width, height, WindowName.c_str(), nullptr, nullptr);
+		window = glfwCreateWindow(width, height, WindowName.c_str(), nullptr, nullptr);
+		glfwSetWindowUserPointer(window, this);
+		glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 	}
 };

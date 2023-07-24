@@ -11,17 +11,18 @@
 
 namespace appNamespace {
 
-    appSwapChain::appSwapChain(AppDevice& deviceRef, VkExtent2D extent)
+    AppSwapChain::AppSwapChain(AppDevice& deviceRef, VkExtent2D extent)
         : device{ deviceRef }, windowExtent{ extent } {
-        createSwapChain();
-        createImageViews();
-        createRenderPass();
-        createDepthResources();
-        createFramebuffers();
-        createSyncObjects();
+        init();
     }
 
-    appSwapChain::~appSwapChain() {
+    AppSwapChain::AppSwapChain(AppDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<AppSwapChain> previousSwapChain) :
+        device{ deviceRef }, windowExtent{ windowExtent }, oldSwapChain{previousSwapChain}{
+        init();
+        oldSwapChain = nullptr;
+    }
+
+    AppSwapChain::~AppSwapChain() {
         for (auto imageView : swapChainImageViews) {
             vkDestroyImageView(device.device(), imageView, nullptr);
         }
@@ -52,7 +53,7 @@ namespace appNamespace {
         }
     }
 
-    VkResult appSwapChain::acquireNextImage(uint32_t* imageIndex) {
+    VkResult AppSwapChain::acquireNextImage(uint32_t* imageIndex) {
         vkWaitForFences(
             device.device(),
             1,
@@ -71,7 +72,7 @@ namespace appNamespace {
         return result;
     }
 
-    VkResult appSwapChain::submitCommandBuffers(
+    VkResult AppSwapChain::submitCommandBuffers(
         const VkCommandBuffer* buffers, uint32_t* imageIndex) {
         if (imagesInFlight[*imageIndex] != VK_NULL_HANDLE) {
             vkWaitForFences(device.device(), 1, &imagesInFlight[*imageIndex], VK_TRUE, UINT64_MAX);
@@ -119,7 +120,16 @@ namespace appNamespace {
         return result;
     }
 
-    void appSwapChain::createSwapChain() {
+    void AppSwapChain::init(){
+        createSwapChain();
+        createImageViews();
+        createRenderPass();
+        createDepthResources();
+        createFramebuffers();
+        createSyncObjects();
+    }
+
+    void AppSwapChain::createSwapChain() {
         SwapChainSupportDetails swapChainSupport = device.getSwapChainSupport();
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -163,7 +173,7 @@ namespace appNamespace {
         createInfo.presentMode = presentMode;
         createInfo.clipped = VK_TRUE;
 
-        createInfo.oldSwapchain = VK_NULL_HANDLE;
+        createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE: oldSwapChain->swapChain;
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
             throw std::runtime_error("failed to create swap chain!");
@@ -181,7 +191,7 @@ namespace appNamespace {
         swapChainExtent = extent;
     }
 
-    void appSwapChain::createImageViews() {
+    void AppSwapChain::createImageViews() {
         swapChainImageViews.resize(swapChainImages.size());
         for (size_t i = 0; i < swapChainImages.size(); i++) {
             VkImageViewCreateInfo viewInfo{};
@@ -202,7 +212,7 @@ namespace appNamespace {
         }
     }
 
-    void appSwapChain::createRenderPass() {
+    void AppSwapChain::createRenderPass() {
         VkAttachmentDescription depthAttachment{};
         depthAttachment.format = findDepthFormat();
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -263,7 +273,7 @@ namespace appNamespace {
         }
     }
 
-    void appSwapChain::createFramebuffers() {
+    void AppSwapChain::createFramebuffers() {
         swapChainFramebuffers.resize(imageCount());
         for (size_t i = 0; i < imageCount(); i++) {
             std::array<VkImageView, 2> attachments = { swapChainImageViews[i], depthImageViews[i] };
@@ -288,7 +298,7 @@ namespace appNamespace {
         }
     }
 
-    void appSwapChain::createDepthResources() {
+    void AppSwapChain::createDepthResources() {
         VkFormat depthFormat = findDepthFormat();
         VkExtent2D swapChainExtent = getSwapChainExtent();
 
@@ -336,7 +346,7 @@ namespace appNamespace {
         }
     }
 
-    void appSwapChain::createSyncObjects() {
+    void AppSwapChain::createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -360,7 +370,7 @@ namespace appNamespace {
         }
     }
 
-    VkSurfaceFormatKHR appSwapChain::chooseSwapSurfaceFormat(
+    VkSurfaceFormatKHR AppSwapChain::chooseSwapSurfaceFormat(
         const std::vector<VkSurfaceFormatKHR>& availableFormats) {
         for (const auto& availableFormat : availableFormats) {
             if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
@@ -372,7 +382,7 @@ namespace appNamespace {
         return availableFormats[0];
     }
 
-    VkPresentModeKHR appSwapChain::chooseSwapPresentMode(
+    VkPresentModeKHR AppSwapChain::chooseSwapPresentMode(
         const std::vector<VkPresentModeKHR>& availablePresentModes) {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -392,7 +402,7 @@ namespace appNamespace {
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D appSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+    VkExtent2D AppSwapChain::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
         }
@@ -409,7 +419,7 @@ namespace appNamespace {
         }
     }
 
-    VkFormat appSwapChain::findDepthFormat() {
+    VkFormat AppSwapChain::findDepthFormat() {
         return device.findSupportedFormat(
             { VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
             VK_IMAGE_TILING_OPTIMAL,

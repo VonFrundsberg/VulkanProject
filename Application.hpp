@@ -11,8 +11,8 @@
 namespace appNamespace {
 	class Application {
 	public:
-		const uint32_t WIDTH = 800;
-		const uint32_t HEIGHT = 600;
+		const int WIDTH = 800;
+		const int HEIGHT = 600;
 		void run();
 
 		Application();
@@ -22,9 +22,9 @@ namespace appNamespace {
 		Application& operator=(const Application&)=delete;
 
 	private:
-		appWindow window{ WIDTH, HEIGHT, "Application name" };
-		AppDevice appDevice{ window };
-		appSwapChain appSwapChain{ appDevice, window.getExtent() };
+		AppWindow appWindow{ WIDTH, HEIGHT, "Application name" };
+		AppDevice appDevice{ appWindow };
+		std::unique_ptr<AppSwapChain> appSwapChain;
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
@@ -35,6 +35,9 @@ namespace appNamespace {
 		void createPipelineLayout();
 		void createPipeline(const std::string& vertFilePath, const std::string& fragFilePath);
 		void createCommandBuffers();
+		void freeCommandBuffers();
 		void drawFrame();
+		void recreateSwapChain(const std::string& vertFilePath, const std::string& fragFilePath);
+		void recordCommandBuffer(int imageIndex);
 	};
 };

@@ -46,7 +46,7 @@ namespace appNamespace {
 	}
 
 	// class member functions
-	AppDevice::AppDevice(appWindow& window) : window{ window } {
+	AppDevice::AppDevice(AppWindow& window) : window{ window } {
 		createInstance();
 		setupDebugMessenger();
 		createSurface();
@@ -276,10 +276,10 @@ namespace appNamespace {
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 		}
 		
-		//Required extension on metal
-		auto isMetalSurface = std::find(std::begin(extensions), std::end(extensions), "VK_EXT_metal_surface");
+		//Required extension on macOS
+		auto isMacOSSurface = std::find(std::begin(extensions), std::end(extensions), "VK_MVK_macos_surface");
 
-		if (isMetalSurface != std::end(extensions)){
+		if (isMacOSSurface != std::end(extensions)){
 			extensions.push_back("VK_KHR_portability_enumeration");
 			extensions.push_back("VK_KHR_get_physical_device_properties2");
 		}

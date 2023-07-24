@@ -27,11 +27,11 @@ namespace appNamespace {
 		const bool enableValidationLayers = true;
 #endif
 
-		AppDevice(appWindow& window);
+		AppDevice(AppWindow& window);
 		~AppDevice();
 		// Not copyable or movable
 		AppDevice(const AppDevice&) = delete;
-		void operator=(const AppDevice&) = delete;
+		AppDevice& operator=(const AppDevice&) = delete;
 		AppDevice(AppDevice&&) = delete;
 		AppDevice& operator=(AppDevice&&) = delete;
 
@@ -91,7 +91,7 @@ namespace appNamespace {
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-		appWindow& window;
+		AppWindow& window;
 		VkCommandPool commandPool;
 
 

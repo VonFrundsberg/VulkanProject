@@ -5,14 +5,19 @@
 #include "appDevice.hpp"
 
 namespace appNamespace {
-	struct pipelineConfigInfo {
-		VkViewport viewport;
-		VkRect2D scissor; 
+	struct PipelineConfigInfo {
+		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
+
+
+		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
 		VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 		VkPipelineMultisampleStateCreateInfo multisampleInfo;
 		VkPipelineColorBlendAttachmentState colorBlendAttachment;
 		VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+		std::vector<VkDynamicState> dynamicStateEnables;
+		VkPipelineDynamicStateCreateInfo dynamicStateInfo;
 		VkPipelineLayout pipelineLayout = nullptr;
 		VkRenderPass renderPass = nullptr;
 		uint32_t subpass = 0;
@@ -20,19 +25,19 @@ namespace appNamespace {
 	class AppPipeline {
 	public:
 		AppPipeline(const std::string& vertFilePath, const std::string& fragFilePath,
-			AppDevice& device, const pipelineConfigInfo& configInfo);
+			AppDevice& device, const PipelineConfigInfo& configInfo);
 		~AppPipeline();
 
 		AppPipeline(const AppPipeline&) = delete;
-		void operator=(const AppPipeline&) = delete;
+		AppPipeline& operator=(const AppPipeline&) = delete;
 
 		void bind(VkCommandBuffer commandBuffer);
 
-		static pipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
+		static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
 	private:
 		static std::vector<char> readFile(const std::string& filePath);
-		void createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo);
+		void createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo &configInfo);
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 		AppDevice& appDevice;
 		VkPipeline GraphicsPipeline;

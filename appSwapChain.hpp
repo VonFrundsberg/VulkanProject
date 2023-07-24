@@ -8,18 +8,20 @@
 // std lib headers
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace appNamespace {
 
-    class appSwapChain {
+    class AppSwapChain {
     public:
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
-        appSwapChain(AppDevice& deviceRef, VkExtent2D windowExtent);
-        ~appSwapChain();
+        AppSwapChain(AppDevice& deviceRef, VkExtent2D windowExtent);
+        AppSwapChain(AppDevice& deviceRef, VkExtent2D windowExtent, std::shared_ptr<AppSwapChain> previousSwapChain);
+        ~AppSwapChain();
 
-        appSwapChain(const appSwapChain&) = delete;
-        void operator=(const appSwapChain&) = delete;
+        AppSwapChain(const AppSwapChain&) = delete;
+        AppSwapChain& operator=(const AppSwapChain&) = delete;
 
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() { return renderPass; }
@@ -39,6 +41,7 @@ namespace appNamespace {
         VkResult submitCommandBuffers(const VkCommandBuffer* buffers, uint32_t* imageIndex);
 
     private:
+        void init();
         void createSwapChain();
         void createImageViews();
         void createDepthResources();
@@ -69,6 +72,7 @@ namespace appNamespace {
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
+        std::shared_ptr<AppSwapChain> oldSwapChain;
 
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;

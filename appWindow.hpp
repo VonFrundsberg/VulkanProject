@@ -4,24 +4,28 @@
 #include<GLFW/glfw3.h>
 #include <string>
 namespace appNamespace {
-	class appWindow {
+	class AppWindow {
 
 	public:
-		appWindow(uint32_t width, uint32_t height, std::string windowName);
-		~appWindow();
+		AppWindow(int width, int height, std::string windowName);
+		~AppWindow();
 
-		appWindow(const appWindow&) = delete;
-		appWindow& operator=(const appWindow&) = delete;
+		AppWindow(const AppWindow&) = delete;
+		AppWindow& operator=(const AppWindow&) = delete;
 
-		bool shouldClose() { return glfwWindowShouldClose(Window); }
-		VkExtent2D getExtent() { return { width, height }; }
+		bool shouldClose() { return glfwWindowShouldClose(window); }
+		VkExtent2D getExtent() { return { static_cast<uint32_t>(width), static_cast<uint32_t>(height)}; }
+		bool wasWindowResized() { return framebufferResized; }
+		void resetWindowResizedFlag() { framebufferResized = false; }
 		void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 	private:
+		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 		void initWindow();
-		const uint32_t width;
-		const uint32_t height;
+		int width;
+		int height;
+		bool framebufferResized = false;
 
 		std::string WindowName;
-		GLFWwindow* Window;
+		GLFWwindow* window;
 	};
 };
