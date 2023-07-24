@@ -74,7 +74,7 @@ namespace appNamespace {
 
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-		appInfo.pApplicationName = "LittleVulkanEngine App";
+		appInfo.pApplicationName = "VulkanEngine App";
 		appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
 		appInfo.pEngineName = "No Engine";
 		appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -87,6 +87,11 @@ namespace appNamespace {
 		auto extensions = getRequiredExtensions();
 		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 		createInfo.ppEnabledExtensionNames = extensions.data();
+
+		auto isPortabilityExtension = std::find(std::begin(extensions), std::end(extensions), "VK_KHR_portability_enumeration");
+		if (isPortabilityExtension != std::end(extensions)) {
+			createInfo.flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+		}
 
 		VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
 		if (enableValidationLayers) {
@@ -267,9 +272,16 @@ namespace appNamespace {
 		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
 		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
 		if (enableValidationLayers) {
 			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+		
+		//Required extension on metal
+		auto isMetalSurface = std::find(std::begin(extensions), std::end(extensions), "VK_EXT_metal_surface");
+
+		if (isMetalSurface != std::end(extensions)){
+			extensions.push_back("VK_KHR_portability_enumeration");
+			extensions.push_back("VK_KHR_get_physical_device_properties2");
 		}
 
 		return extensions;

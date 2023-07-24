@@ -33,9 +33,8 @@ namespace appNamespace {
 
 		void loadModels();
 		void createPipelineLayout();
-		void createPipeline();
+		void createPipeline(const std::string& vertFilePath, const std::string& fragFilePath);
 		void createCommandBuffers();
 		void drawFrame();
-
 	};
 };

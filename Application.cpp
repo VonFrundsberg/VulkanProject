@@ -15,7 +15,7 @@ namespace appNamespace {
 	{	
 		loadModels();
 		createPipelineLayout();
-		createPipeline();
+		createPipeline("shaders/vert.spv", "shaders/frag.spv");
 		createCommandBuffers();
 	}
 	Application::~Application()
@@ -43,11 +43,11 @@ namespace appNamespace {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 	}
-	void Application::createPipeline(){
+	void Application::createPipeline(const std::string& vertFilePath, const std::string& fragFilePath){
 		auto pipelineConfig = AppPipeline::defaultPipelineConfigInfo(appSwapChain.width(), appSwapChain.height());
 		pipelineConfig.renderPass = appSwapChain.getRenderPass();
 		pipelineConfig.pipelineLayout = pipelineLayout;
-		appPipeline = std::make_unique<AppPipeline>("shaders/vert.spv", "shaders/frag.spv", appDevice, pipelineConfig);
+		appPipeline = std::make_unique<AppPipeline>(vertFilePath, fragFilePath, appDevice, pipelineConfig);
 	}
 	void Application::createCommandBuffers(){
 		commandBuffers.resize(appSwapChain.imageCount());

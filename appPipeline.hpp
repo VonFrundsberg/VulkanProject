@@ -33,7 +33,6 @@ namespace appNamespace {
 	private:
 		static std::vector<char> readFile(const std::string& filePath);
 		void createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const pipelineConfigInfo &configInfo);
-		
 		void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
 		AppDevice& appDevice;
 		VkPipeline GraphicsPipeline;
