@@ -4,7 +4,7 @@
 #include "appPipeline.hpp"
 #include "appDevice.hpp"
 #include "appSwapChain.hpp"
-#include "appModel.hpp"
+#include "appObject.hpp"
 #include <memory>
 #include <vector>
 
@@ -28,10 +28,11 @@ namespace appNamespace {
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
 		std::vector<VkCommandBuffer> commandBuffers;
-		std::unique_ptr<AppModel> appModel;  
+		std::vector<AppObject> appObjects;  
 
 
-		void loadModels();
+		void loadObjects();
+		void renderAppObjects(VkCommandBuffer commandBuffer);
 		void createPipelineLayout();
 		void createPipeline(const std::string& vertFilePath, const std::string& fragFilePath);
 		void createCommandBuffers();

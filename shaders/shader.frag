@@ -4,8 +4,9 @@
 
 
 layout(push_constant) uniform Push{
-	vec3 offset;
-	vec3 color;
+	vec4 offset;
+	vec4 color;
+	mat4 transform;
 } push;
 //layout(location = 0) in vec3 fragColor;
 //layout(location = 1) in vec2 fragTexCoord;
@@ -14,5 +15,5 @@ layout(location = 0) out vec4 outColor;
 
 void main(){
 	//outColor = texture(texSampler, fragTexCoord);
-	outColor = vec4(push.color, 1.0);
+	outColor = vec4((push.color).xyz, 1.0);
 }

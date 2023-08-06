@@ -5,12 +5,14 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 namespace appNamespace {
 
 	struct SimplePushConstantData {
-		alignas(16) glm::vec3 offset;
-		alignas(16) glm::vec3 color;
+		 glm::vec4 offset;
+		 glm::vec4 color;
+		 glm::mat4 transform{ 1.0f };
 };
 	void Application::run()
 	{
@@ -22,7 +24,7 @@ namespace appNamespace {
 	}
 	Application::Application()
 	{	
-		loadModels();
+		loadObjects();
 		createPipelineLayout();
 		recreateSwapChain("shaders/vert.spv", "shaders/frag.spv");
 		createCommandBuffers();
@@ -31,13 +33,39 @@ namespace appNamespace {
 	{
 		vkDestroyPipelineLayout(appDevice.device(), pipelineLayout, nullptr);
 	}
-	void Application::loadModels(){
+	void Application::loadObjects(){
 		std::vector<AppModel::Vertex> vertices{
-			{{0.0f, -0.5f, 1.0f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, 0.5f, 1.0f}, {0.0f, 1.0f, 0.0f}},
-			{{-0.5f, 0.5f, 1.0f}, {0.0f, 0.0f, 1.0f}}
+			{{0.0f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{-0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}}
 		};
-		appModel = std::make_unique<AppModel>(appDevice, vertices);
+		auto appModel = std::make_shared<AppModel>(appDevice, vertices);
+		auto triangle = AppObject::createAppObject();
+		triangle.model = appModel;
+		triangle.color = { 0.1f, 0.8f, 0.1f, 0.0f };
+		triangle.transform.translation.x = 0.2f;
+		triangle.transform.scale.x = 1.2f;
+		triangle.transform.rotation.z = .25f * glm::two_pi<float>();
+
+
+		appObjects.push_back(std::move(triangle));
+	}
+	void Application::renderAppObjects(VkCommandBuffer commandBuffer)
+	{
+		appPipeline->bind(commandBuffer);
+		for (auto& object : appObjects) {
+
+			object.transform.rotation.z = glm::mod(object.transform.rotation.z + 0.01f, glm::two_pi<float>());
+			SimplePushConstantData push{};
+			push.offset = object.transform.translation;
+			push.color = object.color;
+			push.transform = object.transform.mat4();
+			vkCmdPushConstants(commandBuffer, pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
+				&push);
+			object.model->bind(commandBuffer);
+			object.model->draw(commandBuffer);
+		}
 	}
 	void Application::createPipelineLayout()
 	{
@@ -134,8 +162,6 @@ namespace appNamespace {
 	}
 	void Application::recordCommandBuffer(int imageIndex)
 	{
-		static int frame = 0;
-		frame = (frame + 1) % 1000;
 		int i = imageIndex;
 		VkCommandBufferBeginInfo beginInfo{};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -170,21 +196,7 @@ namespace appNamespace {
 		vkCmdSetViewport(commandBuffers[i], 0, 1, &viewport);
 		vkCmdSetScissor(commandBuffers[i], 0, 1, &scissor);
 
-		appPipeline->bind(commandBuffers[i]);
-		appModel->bind(commandBuffers[i]);
-
-		for (int j = 0; j < 4; j++) {
-			SimplePushConstantData push{};
-			push.offset = { -0.5f + frame * 0.002f, -0.4f + j * 0.25f, 0.0f };
-			push.color = { 0.0f, 0.0f, 0.2f + 0.2f * j };
-
-			vkCmdPushConstants(commandBuffers[i], pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
-				&push);
-			appModel->draw(commandBuffers[i]);	
-		}
-
-		
+		this->renderAppObjects(commandBuffers[i]);		
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {

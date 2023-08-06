@@ -103,17 +103,7 @@ namespace appNamespace {
 	}
 	void AppPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo &configInfo)
 	{
-		/*assert(
-			configInfo.pipelineLayout != VK_NULL_HANDLE &&
-			"Cannot create graphics pipeline: no pipelineLayout provided in configInfo");
-
-		assert(
-			configInfo.renderPass != VK_NULL_HANDLE &&
-			"Cannot create graphics pipeline: no renderPass provided in configInfo");*/
-
-		
-
-		auto vertShaderCode = readFile(vertFilePath);
+				auto vertShaderCode = readFile(vertFilePath);
 		auto fragShaderCode = readFile(fragFilePath);
 
 		createShaderModule(vertShaderCode, &VertShaderModule);

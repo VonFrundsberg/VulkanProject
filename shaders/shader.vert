@@ -14,14 +14,15 @@ layout(location = 1) in vec3 inColor;
 //layout(location = 1) out vec2 fragTexCoord;
 
 layout(push_constant) uniform Push{
-	vec3 offset;
-	vec3 color;
+	vec4 offset;
+	vec4 color;
+	mat4 transform;
 } push;
 
 void main()
 {
 	//gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
-	gl_Position = vec4(inPosition + push.offset, 1.0);
+	gl_Position = push.transform * vec4(inPosition + (push.offset.xyz), 1.0);
 	//fragColor =	inColor;
 	//fragTexCoord = inTexCoord;
 }
