@@ -9,7 +9,6 @@
 
 namespace appNamespace {
 	struct SimplePushConstantData {
-		glm::vec4 offset;
 		glm::vec4 color;
 		glm::mat4 transform{ 1.0f };
 	};
@@ -56,9 +55,9 @@ namespace appNamespace {
 		appPipeline->bind(commandBuffer);
 		for (auto& object : appObjects) {
 
-			object.transform.rotation.z = glm::mod(object.transform.rotation.z + 0.01f, glm::two_pi<float>());
-			SimplePushConstantData push{};
-			push.offset = object.transform.translation;
+			object.transform.rotation.y = glm::mod(object.transform.rotation.y + 0.01f, glm::two_pi<float>());
+			object.transform.rotation.x = glm::mod(object.transform.rotation.x + 0.005f, glm::two_pi<float>());
+			SimplePushConstantData push{};	
 			push.color = object.color;
 			push.transform = object.transform.mat4();
 			vkCmdPushConstants(commandBuffer, pipelineLayout,
