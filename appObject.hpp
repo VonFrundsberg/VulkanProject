@@ -50,7 +50,7 @@ namespace appNamespace {
 		using id_t = unsigned int;
 		static AppObject createAppObject(){
 			static id_t currentId = 0;
-			return AppObject(currentId++);
+            return AppObject{ currentId++ };
 		}
 
 		AppObject(const AppObject&) = delete;

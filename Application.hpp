@@ -12,6 +12,7 @@ namespace appNamespace {
 	public:
 		const int WIDTH = 800;
 		const int HEIGHT = 600;
+		const float MAX_FRAME_TIME = 0.1f;
 		void run();
 
 		Application();
