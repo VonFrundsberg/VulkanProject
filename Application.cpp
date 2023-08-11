@@ -1,10 +1,14 @@
 #include "Application.hpp"
-#include "appCamera.hpp"
-#include "simpleRenderSystem.hpp"
-#include "keyboardController.hpp"
+#include "src/appCamera.hpp"
+#include "src/simpleRenderSystem.hpp"
+#include "src/controller/keyboardController.hpp"
+
+
 #include <iostream>
 #include <array>
 #include <chrono>
+#include <thread>
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -16,26 +20,24 @@ namespace appNamespace {
 	{
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass() };
         AppCamera camera{};
-        //camera.setViewDirection(glm::vec3{ 0.0f }, glm::vec3{ 0.5f, 0.0f, 1.0f });
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
 
         auto viewerObject = AppObject::createAppObject();
         KeyboardController cameraController{};
         auto currentTime = std::chrono::high_resolution_clock::now();
 
-
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents();
             auto newTime = std::chrono::high_resolution_clock::now();
-            float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
+            float frameTimeFull = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
+            frameTimeFull = glm::min(frameTimeFull, MAX_FRAME_TIME);
+            //std::cout << 1.0 / abs(frameTimeFull) << std::endl;
 
-            frameTime = glm::min(frameTime, MAX_FRAME_TIME);
-
-            cameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTime, viewerObject);
+            cameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
             float aspect = appRenderer.getAspectRatio();
-            //camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+            
             camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 10.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
@@ -44,6 +46,8 @@ namespace appNamespace {
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 			}
+            auto renderingTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - std::chrono::high_resolution_clock::now()).count();
+            std::this_thread::sleep_for(std::chrono::duration < float, std::chrono::seconds::period>(1.0 / this->FPS_CAP + renderingTime));
 		}
 		vkDeviceWaitIdle(appDevice.device());
 	}
