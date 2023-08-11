@@ -2,6 +2,7 @@
 #include "src/appCamera.hpp"
 #include "src/simpleRenderSystem.hpp"
 #include "src/controller/keyboardController.hpp"
+#include "src/controller/mouseController.hpp"
 
 
 #include <iostream>
@@ -23,7 +24,8 @@ namespace appNamespace {
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
 
         auto viewerObject = AppObject::createAppObject();
-        KeyboardController cameraController{};
+        KeyboardController keyboardCameraController{};
+        MouseController mouseCameraController{appWindow.getGLFWwindow(), true};
         auto currentTime = std::chrono::high_resolution_clock::now();
 
 		while (!appWindow.shouldClose()) {
@@ -34,7 +36,8 @@ namespace appNamespace {
             frameTimeFull = glm::min(frameTimeFull, MAX_FRAME_TIME);
             //std::cout << 1.0 / abs(frameTimeFull) << std::endl;
 
-            cameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
+            keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
+            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
             float aspect = appRenderer.getAspectRatio();
             
