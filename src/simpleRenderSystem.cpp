@@ -9,8 +9,8 @@
 
 namespace appNamespace {
 	struct SimplePushConstantData {
-		glm::vec4 color;
 		glm::mat4 transform{ 1.0f };
+		glm::mat4 normalMatrix{ 1.0f };
 	};
 	SimpleRenderSystem::SimpleRenderSystem(AppDevice& device, VkRenderPass renderPass): appDevice{device}
 	{ 
@@ -56,8 +56,9 @@ namespace appNamespace {
 		auto projectionView = camera.getProjection() * camera.getView();
 		for (auto& object : appObjects) {
 			SimplePushConstantData push{};	
-			push.color = object.color;
-			push.transform = projectionView * object.transform.mat4();
+			auto modelMatrix = object.transform.mat4();
+			push.transform = projectionView * modelMatrix;
+			push.normalMatrix = object.transform.normalMatrix();
 			vkCmdPushConstants(commandBuffer, pipelineLayout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
 				&push);

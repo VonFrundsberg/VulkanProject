@@ -1,8 +1,8 @@
 #version 450
 
 layout(push_constant) uniform Push{
-	vec4 color;
-	mat4 transform;
+	mat4 transform; //projection * view * model
+	mat4 normalMatrix; 
 } push;
 
 layout(location = 0) in vec3 fragColor;
