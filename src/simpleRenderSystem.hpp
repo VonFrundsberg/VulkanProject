@@ -4,6 +4,7 @@
 #include "appDevice.hpp"
 #include "appObject.hpp"
 #include "appCamera.hpp"
+#include "frameInfo.hpp"
 #include <memory>
 #include <vector>
 
@@ -15,7 +16,7 @@ namespace appNamespace {
 
 		SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 		SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
-		void renderAppObjects(VkCommandBuffer commandBuffer, std::vector<AppObject>& appObjects, const AppCamera& camera);
+		void renderAppObjects(FrameInfo& frameInfo, std::vector<AppObject>& appObjects);
 	private:
 		AppDevice &appDevice;
 		std::unique_ptr<AppPipeline> appPipeline;

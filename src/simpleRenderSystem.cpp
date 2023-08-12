@@ -50,20 +50,20 @@ namespace appNamespace {
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		appPipeline = std::make_unique<AppPipeline>(vertFilePath, fragFilePath, appDevice, pipelineConfig);
 	}
-	void SimpleRenderSystem::renderAppObjects(VkCommandBuffer commandBuffer, std::vector<AppObject>& appObjects, const AppCamera& camera)
+	void SimpleRenderSystem::renderAppObjects(FrameInfo&frameInfo, std::vector<AppObject>& appObjects)
 	{
-		appPipeline->bind(commandBuffer);
-		auto projectionView = camera.getProjection() * camera.getView();
+		appPipeline->bind(frameInfo.commandBuffer);
+		auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();
 		for (auto& object : appObjects) {
 			SimplePushConstantData push{};	
 			auto modelMatrix = object.transform.mat4();
 			push.transform = projectionView * modelMatrix;
 			push.normalMatrix = object.transform.normalMatrix();
-			vkCmdPushConstants(commandBuffer, pipelineLayout,
+			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
 				&push);
-			object.model->bind(commandBuffer);
-			object.model->draw(commandBuffer);
+			object.model->bind(frameInfo.commandBuffer);
+			object.model->draw(frameInfo.commandBuffer);
 		}
 	}
 };

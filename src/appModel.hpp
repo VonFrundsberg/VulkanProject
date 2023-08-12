@@ -1,5 +1,6 @@
 #pragma once
 #include "appDevice.hpp"
+#include "buffers.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -47,14 +48,11 @@ namespace appNamespace {
 		AppDevice& appDevice;
 
 
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
+		std::unique_ptr<Buffer> vertexBuffer;
 		uint32_t vertexCount;
 
-
 		bool hasIndexBuffer = false;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		std::unique_ptr<Buffer> indexBuffer;
 		uint32_t indexCount;
 	};
 }

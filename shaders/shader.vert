@@ -18,9 +18,6 @@ const float AMBIENT = 0.02;
 void main()
 {
 	gl_Position = push.transform * vec4(inPosition, 1.0);
-	//vec3 normalWorldSpace = normalize(mat3(push.modelMatrix) * inNormal);
-	//mat3 normalMatrix = transpose(inverse(mat3(push.modelMatrix)));
-	//vec3 normalWorldSpace = normalize(normalMatrix * inNormal);
 	vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * inNormal);
 	float lightIntensity = AMBIENT + max(dot(normalWorldSpace, DIRECTION_TO_LIGHT), 0);
 	fragColor = lightIntensity * inColor;

@@ -17,8 +17,22 @@
 
 namespace appNamespace {
 
+    struct GlobalUBO {
+        glm::mat4 projectionView{ 1.0f };
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.0f, -3.0f, 1.0f });
+    };
+
+
 	void Application::run()
 	{
+        std::vector<std::unique_ptr<Buffer>> uboBuffers(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
+
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<Buffer>(appDevice, sizeof(GlobalUBO),
+                1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+            uboBuffers[i]->map();
+        }
+
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass() };
         AppCamera camera{};
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
@@ -41,11 +55,20 @@ namespace appNamespace {
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
             float aspect = appRenderer.getAspectRatio();
             
-            camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 100.0f);
+            camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
+                int frameIndex = appRenderer.getFrameIndex();
+                FrameInfo frameInfo{frameIndex, frameTimeFull, commandBuffer, camera};
+                //update 
+                GlobalUBO ubo{};
+                ubo.projectionView = camera.getProjection() * camera.getView();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo);
+                uboBuffers[frameIndex]->flush();
+
+                //render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
-				simpleRenderSystem.renderAppObjects(commandBuffer, this->appObjects, camera);
+				simpleRenderSystem.renderAppObjects(frameInfo, this->appObjects);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 			}
@@ -63,7 +86,7 @@ namespace appNamespace {
 
     void Application::loadObjects() {
         std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/City1Block1.obj");
-        int n = 10;
+        int n = 1;
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto cube = AppObject::createAppObject();
