@@ -8,13 +8,9 @@
 #include <glm/gtc/constants.hpp>
 
 namespace appNamespace {
-	struct SimplePushConstantData {
-		glm::mat4 transform{ 1.0f };
-		glm::mat4 normalMatrix{ 1.0f };
-	};
-	UIRenderSystem::UIRenderSystem(AppDevice& device, VkRenderPass renderPass): appDevice{device}
+	UIRenderSystem::UIRenderSystem(AppDevice& device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout): appDevice{device}
 	{ 
-		createPipelineLayout();
+		createPipelineLayout(globalSetLayout);
 		createPipeline(renderPass);
 	}
 	UIRenderSystem::~UIRenderSystem()
@@ -22,21 +18,22 @@ namespace appNamespace {
 		vkDestroyPipelineLayout(appDevice.device(), pipelineLayout, nullptr);
 	}
  
-	void UIRenderSystem::createPipelineLayout()
+	void UIRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout)
 	{
 
-		VkPushConstantRange pushConstantRange{};
+		/*VkPushConstantRange pushConstantRange{};
 		pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 		pushConstantRange.offset = 0;
-		pushConstantRange.size = sizeof(SimplePushConstantData);
+		pushConstantRange.size = sizeof(SimplePushConstantData);*/
 
+		std::vector< VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout };
 
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		pipelineLayoutInfo.setLayoutCount = 0;
-		pipelineLayoutInfo.pSetLayouts = nullptr;
-		pipelineLayoutInfo.pushConstantRangeCount = 1;
-		pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
+		pipelineLayoutInfo.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+		pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+		pipelineLayoutInfo.pushConstantRangeCount = 0;
+		pipelineLayoutInfo.pPushConstantRanges = nullptr;
 
 		if (vkCreatePipelineLayout(appDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create pipeline layout!");
@@ -45,28 +42,29 @@ namespace appNamespace {
 	void UIRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 		PipelineConfigInfo pipelineConfig{};
-		const std::string vertFilePath = "shaders/vert.spv";
-		const std::string fragFilePath = "shaders/frag.spv";
+		const std::string vertFilePath = "shaders/ui_vert.spv";
+		const std::string fragFilePath = "shaders/ui_frag.spv";
 		AppPipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		appPipeline = std::make_unique<AppPipeline>(vertFilePath, fragFilePath, appDevice, pipelineConfig);
 	}
-	void UIRenderSystem::renderAppObjects(FrameInfo&frameInfo, std::vector<AppObject>& appObjects)
+	void UIRenderSystem::render(FrameInfo&frameInfo)
 	{
 		appPipeline->bind(frameInfo.commandBuffer);
-		auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();
-		for (auto& object : appObjects) {
-			SimplePushConstantData push{};	
-			auto modelMatrix = object.transform.mat4();
-			push.transform = projectionView * modelMatrix;
-			push.normalMatrix = object.transform.normalMatrix();
-			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
-				&push);
-			object.model->bind(frameInfo.commandBuffer);
-			object.model->draw(frameInfo.commandBuffer);
-		}
+		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+			&frameInfo.globalDescriptorSet, 0, nullptr);
+		vkCmdDraw(frameInfo.commandBuffer, 3, 1, 0, 0);
+		/*for (auto& kv : frameInfo.uiObjects) {
+			auto& object = kv.second;
+			if (object.isVisible()) {
+				vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
+					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, 0,
+					nullptr);
+				object.model->bind(frameInfo.commandBuffer);
+				object.model->draw(frameInfo.commandBuffer);
+			}
+		}*/
 	}
 };
 

@@ -11,18 +11,18 @@
 namespace appNamespace {
 	class UIRenderSystem {
 	public:
-		UIRenderSystem(AppDevice &device, VkRenderPass renderPass);
+		UIRenderSystem(AppDevice &device, VkRenderPass renderPass, VkDescriptorSetLayout globalSetLayout);
 		~UIRenderSystem();
 
 		UIRenderSystem(const UIRenderSystem&) = delete;
 		UIRenderSystem& operator=(const UIRenderSystem&) = delete;
-		void renderAppObjects(FrameInfo& frameInfo, std::vector<AppObject>& appObjects);
+		void render(FrameInfo& frameInfo);
 	private:
 		AppDevice &appDevice;
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;
 
-		void createPipelineLayout();
+		void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
 		void createPipeline(VkRenderPass renderPass);
 	};
 };

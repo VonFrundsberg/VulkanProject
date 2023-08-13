@@ -1,6 +1,7 @@
 #include "Application.hpp"
 #include "src/appCamera.hpp"
 #include "src/renderSystems/simpleRenderSystem.hpp"
+#include "src/renderSystems/UI_RenderSystem.hpp"
 #include "src/controller/keyboardController.hpp"
 #include "src/controller/mouseController.hpp"
 
@@ -47,6 +48,8 @@ namespace appNamespace {
 
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout() };
+        UIRenderSystem UI_RenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout() };
          
         AppCamera camera{};
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
@@ -90,6 +93,7 @@ namespace appNamespace {
                 //render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
 				simpleRenderSystem.renderAppObjects(frameInfo);
+                UI_RenderSystem.render(frameInfo);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 			}
