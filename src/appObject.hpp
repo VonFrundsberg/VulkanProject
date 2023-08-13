@@ -1,6 +1,6 @@
 #pragma once
 
-#include "appModel.hpp"
+#include "texturesModels/appModel.hpp"
 //#include "frameInfo.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>

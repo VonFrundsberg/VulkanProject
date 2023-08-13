@@ -1,15 +1,16 @@
 #pragma once
-#include "appDevice.hpp"
-#include "buffers.hpp"
+#include "../appDevice.hpp"
+#include "../buffers.hpp"
+#include "appModel.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
 namespace appNamespace {
-	class AppModel {
+	class AppTexture {
 	public:
-		struct Vertex {
+		/*struct Vertex {
 			glm::vec3 position{};
 			glm::vec3 color{};
 			glm::vec3 normal{};
@@ -21,28 +22,28 @@ namespace appNamespace {
 			bool operator==(const Vertex& other) const {
 				return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
 			}
-		};
+		};*/
 
-		struct Builder {
-			std::vector<Vertex> vertices{};
+		/*struct Builder {
+			std::vector<AppModel::Vertex> vertices{};
 			std::vector<uint32_t> indices{};
 			void loadModel(const std::string& filepath);
 		};
 
 
 
-		AppModel(AppDevice& device, const AppModel::Builder &builder);
-		~AppModel();
+		AppTexture(AppDevice& device, const AppTexture::Builder &builder);
+		~AppTexture();
 
-		AppModel(const AppModel&) = delete;
-		AppModel& operator=(const AppModel&) = delete;
+		AppTexture(const AppTexture&) = delete;
+		AppTexture& operator=(const AppTexture&) = delete;
 
-		static std::unique_ptr<AppModel> createModelFromFile(AppDevice& device, const std::string& filepath);
+		static std::unique_ptr<AppTexture> createModelFromFile(AppDevice& device, const std::string& filepath);
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
 	private:
-		void createVertexBuffers(const std::vector<Vertex>& vertices);
+		void createVertexBuffers(const std::vector<AppModel::Vertex>& vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& indices);
 
 		AppDevice& appDevice;
@@ -53,6 +54,6 @@ namespace appNamespace {
 
 		bool hasIndexBuffer = false;
 		std::unique_ptr<Buffer> indexBuffer;
-		uint32_t indexCount;
+		uint32_t indexCount;*/
 	};
 }

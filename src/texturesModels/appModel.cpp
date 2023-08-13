@@ -1,18 +1,16 @@
+#include "../appUtils.hpp"
 #include "appModel.hpp"
-#include "appUtils.hpp"
-
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
 #include <cassert>
 #include <iostream>
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 namespace std {
 	template<>
-	struct hash<appNamespace::AppModel::Vertex> {
-		size_t operator()(appNamespace::AppModel::Vertex const& vertex) const {
+	struct hash<appNamespace::Vertex> {
+		size_t operator()(appNamespace::Vertex const& vertex) const {
 			size_t seed = 0;
 			appNamespace::hashCombine(seed, vertex.position, vertex.color, vertex.normal, vertex.uv);
 			return seed;
@@ -25,8 +23,7 @@ namespace appNamespace {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
 	}
-	AppModel::~AppModel() {
-		
+	AppModel::~AppModel() {	
 	}
 	void AppModel::bind(VkCommandBuffer commandBuffer) {
 		VkBuffer buffers[] = { vertexBuffer->getBuffer() };
@@ -86,24 +83,6 @@ namespace appNamespace {
 
 		appDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
-
-	std::vector<VkVertexInputBindingDescription> AppModel::Vertex::getBindingDescriptions() {
-		std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
-		bindingDescriptions[0].binding = 0;
-		bindingDescriptions[0].stride = sizeof(Vertex);
-		bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		return bindingDescriptions;
-	}
-
-	std::vector<VkVertexInputAttributeDescription> AppModel::Vertex::getAtrributeDescriptions() {
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
-
-		attributeDescriptions.push_back({ 0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, position) });
-		attributeDescriptions.push_back({ 1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, color) });
-		attributeDescriptions.push_back({ 2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, normal) });
-		attributeDescriptions.push_back({ 3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, uv) });
-		return attributeDescriptions;
-	} 
 
 	void AppModel::Builder::loadModel(const std::string& filepath)
 	{

@@ -1,5 +1,5 @@
 #include "appPipeline.hpp"
-#include "appModel.hpp"
+#include "texturesModels/appModel.hpp"
 #include <fstream>
 #include <iostream>
 #include <cassert>
@@ -125,8 +125,8 @@ namespace appNamespace {
 		shaderStages[1].pSpecializationInfo = nullptr;
 
 
-		auto bindingDescriptions = AppModel::Vertex::getBindingDescriptions();
-		auto attributeDesriptions = AppModel::Vertex::getAtrributeDescriptions();
+		auto bindingDescriptions = Vertex::getBindingDescriptions();
+		auto attributeDesriptions = Vertex::getAtrributeDescriptions();
 
 		VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 		vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
