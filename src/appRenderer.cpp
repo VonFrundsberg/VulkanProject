@@ -7,7 +7,7 @@ namespace appNamespace {
 
 	AppRenderer::AppRenderer(AppWindow &window, AppDevice &device): appWindow{window}, appDevice{device}
 	{
-		recreateSwapChain("shaders/vert.spv", "shaders/frag.spv");
+		recreateSwapChain();
 		createCommandBuffers();
 	}
 	AppRenderer::~AppRenderer()
@@ -20,7 +20,7 @@ namespace appNamespace {
 		auto result = appSwapChain->acquireNextImage(&currentImageIndex);
 
 		if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-			recreateSwapChain("shaders/vert.spv", "shaders/frag.spv");
+			recreateSwapChain();
 			return nullptr;
 		}
 		if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -49,7 +49,7 @@ namespace appNamespace {
 		auto result = appSwapChain->submitCommandBuffers(&commandBuffer, &currentImageIndex);
 		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || appWindow.wasWindowResized()) {
 			appWindow.resetWindowResizedFlag();
-			recreateSwapChain("shaders/vert.spv", "shaders/frag.spv");
+			recreateSwapChain();
 		}else if (result != VK_SUCCESS) {
 			throw std::runtime_error("failed to present swap chain image!");
 		}
@@ -118,7 +118,7 @@ namespace appNamespace {
 	}
 
 	
-	void AppRenderer::recreateSwapChain(const std::string& vertFilePath, const std::string& fragFilePath)
+	void AppRenderer::recreateSwapChain()
 	{
 		auto extent = appWindow.getExtent();
 		while (extent.width == 0 || extent.height == 0) {

@@ -44,7 +44,7 @@ namespace appNamespace {
 
 		void createCommandBuffers();
 		void freeCommandBuffers();
-		void recreateSwapChain(const std::string& vertFilePath, const std::string& fragFilePath);
+		void recreateSwapChain();
 
 		uint32_t currentImageIndex;
 		int currentFrameIndex{ 0 };

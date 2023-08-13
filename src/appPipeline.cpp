@@ -14,8 +14,6 @@ namespace appNamespace {
 		createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
 	}
 
-
-
 	AppPipeline::~AppPipeline() {
 		vkDestroyShaderModule(appDevice.device(), VertShaderModule, nullptr);
 		vkDestroyShaderModule(appDevice.device(), FragShaderModule, nullptr);
@@ -103,7 +101,7 @@ namespace appNamespace {
 	}
 	void AppPipeline::createGraphicsPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfigInfo &configInfo)
 	{
-				auto vertShaderCode = readFile(vertFilePath);
+		auto vertShaderCode = readFile(vertFilePath);
 		auto fragShaderCode = readFile(fragFilePath);
 
 		createShaderModule(vertShaderCode, &VertShaderModule);

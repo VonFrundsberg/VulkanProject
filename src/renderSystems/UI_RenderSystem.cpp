@@ -1,4 +1,4 @@
-#include "SimpleRenderSystem.hpp"
+#include "UI_RenderSystem.hpp"
 #include <iostream>
 #include <array>
 
@@ -12,17 +12,17 @@ namespace appNamespace {
 		glm::mat4 transform{ 1.0f };
 		glm::mat4 normalMatrix{ 1.0f };
 	};
-	SimpleRenderSystem::SimpleRenderSystem(AppDevice& device, VkRenderPass renderPass): appDevice{device}
+	UIRenderSystem::UIRenderSystem(AppDevice& device, VkRenderPass renderPass): appDevice{device}
 	{ 
 		createPipelineLayout();
-		createPipeline("shaders/vert.spv", "shaders/frag.spv", renderPass);
+		createPipeline(renderPass);
 	}
-	SimpleRenderSystem::~SimpleRenderSystem()
+	UIRenderSystem::~UIRenderSystem()
 	{
 		vkDestroyPipelineLayout(appDevice.device(), pipelineLayout, nullptr);
 	}
  
-	void SimpleRenderSystem::createPipelineLayout()
+	void UIRenderSystem::createPipelineLayout()
 	{
 
 		VkPushConstantRange pushConstantRange{};
@@ -42,15 +42,17 @@ namespace appNamespace {
 			throw std::runtime_error("failed to create pipeline layout!");
 		}
 	}
-	void SimpleRenderSystem::createPipeline(const std::string& vertFilePath, const std::string& fragFilePath, VkRenderPass renderPass) {
+	void UIRenderSystem::createPipeline(VkRenderPass renderPass) {
 		assert(pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout!");
 		PipelineConfigInfo pipelineConfig{};
+		const std::string vertFilePath = "shaders/vert.spv";
+		const std::string fragFilePath = "shaders/frag.spv";
 		AppPipeline::defaultPipelineConfigInfo(pipelineConfig);
 		pipelineConfig.renderPass = renderPass;
 		pipelineConfig.pipelineLayout = pipelineLayout;
 		appPipeline = std::make_unique<AppPipeline>(vertFilePath, fragFilePath, appDevice, pipelineConfig);
 	}
-	void SimpleRenderSystem::renderAppObjects(FrameInfo&frameInfo, std::vector<AppObject>& appObjects)
+	void UIRenderSystem::renderAppObjects(FrameInfo&frameInfo, std::vector<AppObject>& appObjects)
 	{
 		appPipeline->bind(frameInfo.commandBuffer);
 		auto projectionView = frameInfo.camera.getProjection() * frameInfo.camera.getView();

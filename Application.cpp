@@ -1,6 +1,6 @@
 #include "Application.hpp"
 #include "src/appCamera.hpp"
-#include "src/simpleRenderSystem.hpp"
+#include "src/renderSystems/simpleRenderSystem.hpp"
 #include "src/controller/keyboardController.hpp"
 #include "src/controller/mouseController.hpp"
 
@@ -18,8 +18,8 @@
 namespace appNamespace {
 
     struct GlobalUBO {
-        glm::mat4 projectionView{ 1.0f };
-        glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.0f, -3.0f, 1.0f });
+        alignas(16) glm::mat4 projectionView{ 1.0f };
+        alignas(16) glm::vec3 directionToLight = glm::normalize(glm::vec3{ 1.0f, -3.0f, 1.0f });
     };
 
 
@@ -33,7 +33,21 @@ namespace appNamespace {
             uboBuffers[i]->map();
         }
 
-		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass() };
+        auto globalSetLayout = DescriptorSetLayout::Builder(appDevice)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            DescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout() };
+         
         AppCamera camera{};
         camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
 
@@ -47,19 +61,26 @@ namespace appNamespace {
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTimeFull = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
-            frameTimeFull = glm::min(frameTimeFull, MAX_FRAME_TIME);
-            std::cout << 1.0 / abs(frameTimeFull) << std::endl;
-
-            keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
-            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), frameTimeFull, viewerObject);
+            //frameTimeFull = glm::min(frameTimeFull, MAX_FRAME_TIME);
+            //std::cout << 1.0 / abs(frameTimeFull) << std::endl;
+            //std::cout << "total time passed: " << abs(frameTimeFull) << std::endl;
+            auto dt = glm::min(frameTimeFull, MAX_FRAME_TIME);
+            keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
+            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
             float aspect = appRenderer.getAspectRatio();
             
-            camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
+            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
                 int frameIndex = appRenderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTimeFull, commandBuffer, camera};
+                FrameInfo frameInfo{
+                    frameIndex,
+                    dt,
+                    commandBuffer,
+                    camera,
+                    globalDescriptorSets[frameIndex], 
+                    appObjects};
                 //update 
                 GlobalUBO ubo{};
                 ubo.projectionView = camera.getProjection() * camera.getView();
@@ -68,17 +89,24 @@ namespace appNamespace {
 
                 //render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
-				simpleRenderSystem.renderAppObjects(frameInfo, this->appObjects);
+				simpleRenderSystem.renderAppObjects(frameInfo);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 			}
-            auto renderingTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - std::chrono::high_resolution_clock::now()).count();
-            std::this_thread::sleep_for(std::chrono::duration < float, std::chrono::seconds::period>(1.0 / this->FPS_CAP + renderingTime));
+            auto renderingTime = std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count();
+            //std::cout << "sleep for microseconds: " << int(1000000 * (1.0 / this->FPS_CAP - renderingTime)) << std::endl;
+            std::this_thread::sleep_for(std::chrono::microseconds(int( 1000000*(1.0/ this->FPS_CAP - renderingTime))));
+            //std::cout << "should be: " << 1.0 / this->FPS_CAP << ", but we have: " << renderingTime << std::endl;
+           // std::cout << "before sleep we have: " << renderingTime << std::endl;
 		}
 		vkDeviceWaitIdle(appDevice.device());
 	}
 	Application::Application()
-	{	
+	{   
+        globalPool = DescriptorPool::Builder(appDevice)
+            .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
 		loadObjects();
 	}
 	Application::~Application(){
@@ -86,16 +114,16 @@ namespace appNamespace {
 
     void Application::loadObjects() {
         std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/City1Block1.obj");
-        int n = 1;
+        int n = 2;
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto cube = AppObject::createAppObject();
                 cube.model = appModel;
-                cube.transform.translation = { 1 + 10 * i, 1, 1.0f + 10 * j };
+                cube.transform.translation = { -n*10/2 + 10 * i, 10, -n * 10/2 + 10 * j };
                 cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
                 cube.transform.scale = { 0.1f, 0.1f, 0.1f };
 
-                appObjects.push_back(std::move(cube));
+                appObjects.emplace(cube.getId(), std::move(cube));
             }
         }
     }

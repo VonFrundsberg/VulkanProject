@@ -1,7 +1,7 @@
 #version 450
 
 layout(push_constant) uniform Push{
-	mat4 modelMatrix; //projection * view * model
+	mat4 transform; //projection * view * model
 	mat4 normalMatrix; 
 } push;
 

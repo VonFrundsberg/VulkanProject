@@ -1,11 +1,11 @@
 #pragma once
 
 #include "appModel.hpp"
+//#include "frameInfo.hpp"
 
-#include <memory>
-#include <glm/gtx/matrix_operation.hpp>
-#include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <memory>
+#include <unordered_map>
 
 namespace appNamespace {
 	struct TransformComponent{
@@ -22,6 +22,7 @@ namespace appNamespace {
 	class AppObject {
 	public:
 		using id_t = unsigned int;
+		using Map = std::unordered_map<id_t, AppObject>;
 		static AppObject createAppObject(){
 			static id_t currentId = 0;
             return AppObject{ currentId++ };
@@ -37,9 +38,11 @@ namespace appNamespace {
 		std::shared_ptr<AppModel> model{};
 		glm::vec4 color{};
 		TransformComponent transform{};
+		bool isVisible(/*FrameInfo& frameInfo*/);
 	private:
 		AppObject(id_t objectId) : id{ objectId } {};
 		id_t id;
+		bool visible{ false };
 
 	};
 }

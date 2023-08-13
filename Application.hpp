@@ -4,6 +4,7 @@
 #include "src/appDevice.hpp"
 #include "src/appRenderer.hpp"
 #include "src/appObject.hpp"
+#include "src/descriptors.hpp"
 #include <memory>
 #include <vector>
 
@@ -23,11 +24,13 @@ namespace appNamespace {
 		Application& operator=(const Application&)=delete;
 
 	private:
+		void loadObjects();
 		AppWindow appWindow{ WIDTH, HEIGHT, "Application name" };
 		AppDevice appDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, appDevice };
 
-		std::vector<AppObject> appObjects;  
-		void loadObjects();
+
+		std::unique_ptr<DescriptorPool> globalPool{};
+		AppObject::Map appObjects;  
 	};
 };
