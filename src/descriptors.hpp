@@ -89,7 +89,7 @@ namespace appNamespace {
         DescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
 
         bool build(VkDescriptorSet& set);
-        void overwrite(VkDescriptorSet& set);
+        void setDstSet(VkDescriptorSet& set);
 
     private:
         DescriptorSetLayout& setLayout;

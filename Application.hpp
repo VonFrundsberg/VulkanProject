@@ -4,6 +4,7 @@
 #include "src/appDevice.hpp"
 #include "src/appRenderer.hpp"
 #include "src/appObject.hpp"
+#include "src/texturesModels/appTexture.hpp"
 #include "src/descriptors.hpp"
 #include <memory>
 #include <vector>
@@ -25,6 +26,7 @@ namespace appNamespace {
 
 	private:
 		void loadObjects();
+		void loadTextures();
 		AppWindow appWindow{ WIDTH, HEIGHT, "Application name" };
 		AppDevice appDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, appDevice };
@@ -32,5 +34,6 @@ namespace appNamespace {
 
 		std::unique_ptr<DescriptorPool> globalPool{};
 		AppObject::Map appObjects;  
+		std::shared_ptr<AppTexture> texture;
 	};
 };

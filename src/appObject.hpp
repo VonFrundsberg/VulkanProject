@@ -1,6 +1,7 @@
 #pragma once
 
 #include "texturesModels/appModel.hpp"
+#include "texturesModels/appTexture.hpp"
 //#include "frameInfo.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -36,6 +37,7 @@ namespace appNamespace {
 		id_t getId(){ return id; }
 
 		std::shared_ptr<AppModel> model{};
+		std::shared_ptr<AppTexture> texture{};
 		glm::vec4 color{};
 		TransformComponent transform{};
 		bool isVisible(/*FrameInfo& frameInfo*/);

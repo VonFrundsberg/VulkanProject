@@ -40,6 +40,7 @@ namespace appNamespace {
 		VkSurfaceKHR surface() { return surface_; }
 		VkQueue graphicsQueue() { return graphicsQueue_; }
 		VkQueue presentQueue() { return presentQueue_; }
+		VkSampler getTextureSampler() { return textureSampler_; }
 
 		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
@@ -76,6 +77,7 @@ namespace appNamespace {
 		void pickPhysicalDevice();
 		void createLogicalDevice();
 		void createCommandPool();
+		void createTextureSampler();
 
 		// helper functions
 		bool isDeviceSuitable(VkPhysicalDevice device);
@@ -93,7 +95,7 @@ namespace appNamespace {
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 		AppWindow& window;
 		VkCommandPool commandPool;
-
+		VkSampler textureSampler_;
 
 		VkSurfaceKHR surface_;
 		VkQueue graphicsQueue_;

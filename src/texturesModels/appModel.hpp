@@ -17,8 +17,6 @@ namespace appNamespace {
 			void loadModel(const std::string& filepath);
 		};
 
-
-
 		AppModel(AppDevice& device, const AppModel::Builder &builder);
 		~AppModel();
 

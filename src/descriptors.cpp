@@ -110,7 +110,7 @@ namespace appNamespace {
         allocInfo.descriptorSetCount = 1;
 
         // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
-        // a new pool whenever an old pool fills up. But this is beyond our current scope
+        // a new pool whenever an old pool fills up
         if (vkAllocateDescriptorSets(appDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
             return false;
         }
@@ -181,15 +181,15 @@ namespace appNamespace {
         if (!success) {
             return false;
         }
-        overwrite(set);
+        setDstSet(set);
         return true;
     }
 
-    void DescriptorWriter::overwrite(VkDescriptorSet& set) {
+    void DescriptorWriter::setDstSet(VkDescriptorSet& set) {
         for (auto& write : writes) {
             write.dstSet = set;
         }
-        vkUpdateDescriptorSets(pool.appDevice.device(), writes.size(), writes.data(), 0, nullptr);
+        vkUpdateDescriptorSets(this->pool.appDevice.device(), writes.size(), writes.data(), 0, nullptr);
     }
 
 }  // namespace lve

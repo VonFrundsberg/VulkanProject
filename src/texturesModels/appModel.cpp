@@ -120,7 +120,9 @@ namespace appNamespace {
 				}
 				if (index.texcoord_index >= 0) {
 					vertex.uv = { attrib.texcoords[2 * index.texcoord_index + 0],
-									attrib.texcoords[2 * index.texcoord_index + 1] };
+									1.0f - attrib.texcoords[2 * index.texcoord_index + 1] };
+					/*vertex.uv = { attrib.texcoords[2 * index.texcoord_index + 0],
+									attrib.texcoords[2 * index.texcoord_index + 1] };*/
 
 				}
 				if (uniqueVertices.count(vertex) == 0) {
@@ -135,7 +137,7 @@ namespace appNamespace {
 	{
 		AppModel::Builder builder{};
 		builder.loadModel(filepath);
-		std::cout << builder.vertices.size() << std::endl;
+		std::cout << "unique vertices count of " << filepath << " is " << builder.vertices.size() << std::endl;
 		return std::make_unique<AppModel>(device, builder);
 	}
 }

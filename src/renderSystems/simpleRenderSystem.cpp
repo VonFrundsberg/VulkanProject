@@ -59,6 +59,7 @@ namespace appNamespace {
 		appPipeline->bind(frameInfo.commandBuffer);
 		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
 			&frameInfo.globalDescriptorSet, 0, nullptr);
+
 		for (auto& kv : frameInfo.appObjects) {
 			auto& object = kv.second;
 			if (object.isVisible()) {

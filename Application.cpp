@@ -35,14 +35,21 @@ namespace appNamespace {
         }
 
         auto globalSetLayout = DescriptorSetLayout::Builder(appDevice)
-            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+            .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1)
+            .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
             .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = texture->getTextureImageView();
+        imageInfo.sampler = appDevice.getTextureSampler();
+
         for (int i = 0; i < globalDescriptorSets.size(); i++) {
             auto bufferInfo = uboBuffers[i]->descriptorInfo();
             DescriptorWriter(*globalSetLayout, *globalPool)
                 .writeBuffer(0, &bufferInfo)
+                .writeImage(1, &imageInfo)
                 .build(globalDescriptorSets[i]);
         }
 
@@ -93,7 +100,7 @@ namespace appNamespace {
                 //render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
 				simpleRenderSystem.renderAppObjects(frameInfo);
-                UI_RenderSystem.render(frameInfo);
+                //UI_RenderSystem.render(frameInfo);
 				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
 			}
@@ -110,26 +117,48 @@ namespace appNamespace {
         globalPool = DescriptorPool::Builder(appDevice)
             .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
 		loadObjects();
+        loadTextures();
 	}
 	Application::~Application(){
 	}  
 
     void Application::loadObjects() {
-        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/City1Block1.obj");
-        int n = 2;
+        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/tommy.obj");
+        int n = 1;
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto cube = AppObject::createAppObject();
                 cube.model = appModel;
-                cube.transform.translation = { -n*10/2 + 10 * i, 10, -n * 10/2 + 10 * j };
-                cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-                cube.transform.scale = { 0.1f, 0.1f, 0.1f };
+                cube.transform.translation = { -n*10/2 + 10 * i + 5, 0, -n * 10/2 + 10 * j + 5};
+                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
+                cube.transform.rotation = { 3.14, 0.0, 0.0f };
+                //cube.transform.scale = { 0.1f, 0.1f, 0.1f };
+                cube.transform.scale = { 2.0f, 2.0f, 2.0f };
 
                 appObjects.emplace(cube.getId(), std::move(cube));
             }
         }
+
+        //std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./models/City1Block1.obj");
+        //for (int j = 0; j < 1; j++) {
+        //    for (int i = 0; i < 1; i++) {
+        //        auto cube = AppObject::createAppObject();
+        //        cube.model = appModel1;
+        //        cube.transform.translation = { -n * 10 / 2 + 10 * i + 5, 0, -n * 10 / 2 + 10 * j + 5 };
+        //        cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
+        //        //cube.transform.rotation = { 3.14, 0.0, 0.0f };
+        //        //cube.transform.scale = { 0.1f, 0.1f, 0.1f };
+        //        cube.transform.scale = { 0.1f, 0.1f, 0.1f };
+        //        appObjects.emplace(cube.getId(), std::move(cube));
+        //    }
+        //}
+    }
+    void Application::loadTextures()
+    {
+        texture = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
     }
         /*for (int i = 0; i < n; i++) {
             auto cube = AppObject::createAppObject();

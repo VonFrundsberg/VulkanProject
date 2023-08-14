@@ -1,59 +1,42 @@
 #pragma once
 #include "../appDevice.hpp"
 #include "../buffers.hpp"
-#include "appModel.hpp"
+//#include "appModel.hpp"
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+
 #include <vector>
 #include <memory>
 namespace appNamespace {
 	class AppTexture {
 	public:
-		/*struct Vertex {
-			glm::vec3 position{};
-			glm::vec3 color{};
-			glm::vec3 normal{};
-			glm::vec2 uv{};
-
-			static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
-			static std::vector<VkVertexInputAttributeDescription> getAtrributeDescriptions();
-
-			bool operator==(const Vertex& other) const {
-				return position == other.position && color == other.color && normal == other.normal && uv == other.uv;
-			}
-		};*/
-
-		/*struct Builder {
-			std::vector<AppModel::Vertex> vertices{};
-			std::vector<uint32_t> indices{};
-			void loadModel(const std::string& filepath);
+		struct TextureInfo {
+			void* pixels;
+			int texWidth;
+			int texHeight;
+			int texChannels;
+			void loadTexture(const std::string& filepath);
 		};
-
-
-
-		AppTexture(AppDevice& device, const AppTexture::Builder &builder);
+		AppTexture(AppDevice& device, const AppTexture::TextureInfo& texInfo);
 		~AppTexture();
 
 		AppTexture(const AppTexture&) = delete;
 		AppTexture& operator=(const AppTexture&) = delete;
 
-		static std::unique_ptr<AppTexture> createModelFromFile(AppDevice& device, const std::string& filepath);
-
-		void bind(VkCommandBuffer commandBuffer);
-		void draw(VkCommandBuffer commandBuffer);
+		static std::unique_ptr<AppTexture> createTextureFromFile(AppDevice& device, const std::string& filepath);
+		VkImageView getTextureImageView() { return textureImageView; }
 	private:
-		void createVertexBuffers(const std::vector<AppModel::Vertex>& vertices);
-		void createIndexBuffers(const std::vector<uint32_t>& indices);
-
+		void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+			VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+		void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+		void createTextureImageView();
 		AppDevice& appDevice;
 
+		VkImageView textureImageView{};
+		VkImage textureImage{};
+		VkDeviceMemory textureImageMemory{};
+		
 
-		std::unique_ptr<Buffer> vertexBuffer;
-		uint32_t vertexCount;
-
-		bool hasIndexBuffer = false;
-		std::unique_ptr<Buffer> indexBuffer;
-		uint32_t indexCount;*/
 	};
 }
