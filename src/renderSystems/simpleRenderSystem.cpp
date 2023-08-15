@@ -62,16 +62,15 @@ namespace appNamespace {
 
 		for (auto& kv : frameInfo.appObjects) {
 			auto& object = kv.second;
-			if (object.isVisible()) {
-				SimplePushConstantData push{};
-				push.modelMatrix = object.transform.mat4();
-				push.normalMatrix = object.transform.normalMatrix();
-				vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
-					VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
-					&push);
-				object.model->bind(frameInfo.commandBuffer);
-				object.model->draw(frameInfo.commandBuffer);
-			}
+			SimplePushConstantData push{};
+			push.modelMatrix = object.transform.mat4();
+			push.normalMatrix = object.transform.normalMatrix();
+			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
+				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
+				&push);
+			object.model->bind(frameInfo.commandBuffer);
+			object.model->draw(frameInfo.commandBuffer);
+			
 		}
 	}
 };

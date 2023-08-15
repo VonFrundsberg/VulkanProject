@@ -41,6 +41,7 @@ namespace appNamespace {
 		glm::vec4 color{};
 		TransformComponent transform{};
 		bool isVisible(/*FrameInfo& frameInfo*/);
+		AppObject() {};
 	private:
 		AppObject(id_t objectId) : id{ objectId } {};
 		id_t id;

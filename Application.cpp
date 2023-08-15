@@ -20,7 +20,7 @@ namespace appNamespace {
 
     struct GlobalUBO {
         alignas(16) glm::mat4 projectionView{ 1.0f };
-        alignas(16) glm::vec3 directionToLight = glm::normalize(glm::vec3{ 1.0f, -3.0f, 1.0f });
+        alignas(16) glm::vec3 directionToLight = glm::normalize(glm::vec3{ -1.0f, 1.0f, -1.0f });
     };
 
 
@@ -59,9 +59,17 @@ namespace appNamespace {
             globalSetLayout->getDescriptorSetLayout() };
          
         AppCamera camera{};
-        camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
-
+        //camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
+        glm::vec3 cameraDistanceToPlayer = { 0.0f, -2.0f, -1.5f };
+        //glm::vec3 cameraRotation = { 2.5f, 3.14f, 0.0f };
+        glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
+        viewerObject.transform.translation.x = appObjects[0].transform.translation.x;
+        viewerObject.transform.translation.y = appObjects[0].transform.translation.y;
+        viewerObject.transform.translation.z = appObjects[0].transform.translation.z;
+        viewerObject.transform.translation += cameraDistanceToPlayer;
+        viewerObject.transform.rotation = { cameraRotation.x, cameraRotation.y, cameraRotation.z };
+        //AppObject * viewerObject = &appObjects[0];
         KeyboardController keyboardCameraController{};
         MouseController mouseCameraController{appWindow.getGLFWwindow(), true};
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -77,7 +85,25 @@ namespace appNamespace {
             auto dt = glm::min(frameTimeFull, MAX_FRAME_TIME);
             keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
-            camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+            camera.setViewYXZ((viewerObject).transform.translation, (viewerObject).transform.rotation);
+            //viewerObject.transform.translation
+            camera.set3rdPersonCameraView(
+                cameraDistanceToPlayer, viewerObject.transform.translation, (viewerObject).transform.rotation);
+            //camera.setViewTarget((viewerObject).transform.translation + cameraDistanceToPlayer, appObjects[0].transform.translation);
+            appObjects[0].transform.translation.x = viewerObject.transform.translation.x;
+            appObjects[0].transform.translation.y = viewerObject.transform.translation.y;
+            appObjects[0].transform.translation.z = viewerObject.transform.translation.z;
+            //appObjects[0].transform.translation = viewerObject.transform.translation;
+            //appObjects[0].transform.rotation = viewerObject.transform.rotation;
+
+            //appObjects[0].transform.rotation.x = 3.14 - viewerObject.transform.rotation.x;
+            appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
+            //appObjects[0].transform.rotation.z = viewerObject.transform.rotation.z;
+            /*keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, *viewerObject);
+            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, *viewerObject);
+            camera.setViewYXZ((*viewerObject).transform.translation + cameraDistanceToPlayer,
+                            (*viewerObject).transform.rotation * cameraRotation);*/
+            //camera.setViewDirection((*viewerObject).transform.translation + cameraDistanceToPlayer, (*viewerObject).transform.rotation);
             float aspect = appRenderer.getAspectRatio();
             
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
@@ -123,61 +149,46 @@ namespace appNamespace {
         loadTextures();
 	}
 	Application::~Application(){
+
 	}  
 
     void Application::loadObjects() {
-        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/tommy.obj");
         int n = 1;
-        for (int j = 0; j < n; j++) {
-            for (int i = 0; i < n; i++) {
-                auto cube = AppObject::createAppObject();
-                cube.model = appModel;
-                cube.transform.translation = { -n*10/2 + 10 * i + 5, 0, -n * 10/2 + 10 * j + 5};
-                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-                cube.transform.rotation = { 3.14, 0.0, 0.0f };
-                //cube.transform.scale = { 0.1f, 0.1f, 0.1f };
-                cube.transform.scale = { 2.0f, 2.0f, 2.0f };
-
-                appObjects.emplace(cube.getId(), std::move(cube));
+        std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./models/tommy.obj");
+        for (int j = 0; j < 1; j++) {
+            for (int i = 0; i < 1; i++) {
+                auto player = AppObject::createAppObject();
+                player.model = appModel1;
+                player.transform.translation = { 0, 0.0, 0 };
+                player.transform.rotation = { 3.14, 3.14f , 0.0};
+                //house.transform.rotation = { 3.14, 0.0, 0.0f };
+                //house.transform.scale = { 0.5f, 0.5f, 0.5f };
+                player.transform.scale = { 0.5f, 0.5f, 0.5f };
+                appObjects.emplace(player.getId(), std::move(player));
             }
         }
 
-        //std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./models/City1Block1.obj");
-        //for (int j = 0; j < 1; j++) {
-        //    for (int i = 0; i < 1; i++) {
-        //        auto cube = AppObject::createAppObject();
-        //        cube.model = appModel1;
-        //        cube.transform.translation = { -n * 10 / 2 + 10 * i + 5, 0, -n * 10 / 2 + 10 * j + 5 };
-        //        cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-        //        //cube.transform.rotation = { 3.14, 0.0, 0.0f };
-        //        //cube.transform.scale = { 0.1f, 0.1f, 0.1f };
-        //        cube.transform.scale = { 0.1f, 0.1f, 0.1f };
-        //        appObjects.emplace(cube.getId(), std::move(cube));
-        //    }
-        //}
+        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/House.obj");
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                auto house = AppObject::createAppObject();
+                house.model = appModel;
+                house.transform.translation = { -n*10/2 + 10 * i + 5, 5, -n * 10/2 + 10 * j + 5};
+                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
+                house.transform.rotation = { 3.14, 0.0, 0.0f };
+                house.transform.scale = { 0.5f, 0.5f, 0.5f };
+                //cube.transform.scale = { 2.0f, 2.0f, 2.0f };
+                appObjects.emplace(house.getId(), std::move(house));
+            }
+        }
+
+       
     }
     void Application::loadTextures()
     {
+        //texture = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");
         texture = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
     }
-        /*for (int i = 0; i < n; i++) {
-            auto cube = AppObject::createAppObject();
-            cube.model = appModel;
-            cube.transform.translation = { 5 * sin(2 * 3.14 * i / n), 2.0f, 5 * cos(2 * 3.14 * i / n) };
-            cube.transform.scale = { 0.5f, 0.5f, 0.5f };
-            cube.transform.rotation = { 0.0f, -3.14f, -3.14f };
-
-            appObjects.push_back(std::move(cube));
-        }*/
-
-        //appModel = AppModel::createModelFromFile(appDevice, "./models/tommy.obj");
-        /*auto cube1 = AppObject::createAppObject();
-        cube1.model = appModel;
-        cube1.transform.translation = { 0.0f, 0.0f, 0.5f };
-        cube1.transform.scale = { 0.5f, 0.5f, 0.5f };
-
-        appObjects.push_back(std::move(cube1));*/
-	
     
 };
 

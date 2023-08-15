@@ -57,6 +57,7 @@ namespace appNamespace {
 	}
 
 	AppDevice::~AppDevice() {
+		vkDestroySampler(device_, textureSampler_, nullptr);
 		vkDestroyCommandPool(device_, commandPool, nullptr);
 		vkDestroyDevice(device_, nullptr);
 

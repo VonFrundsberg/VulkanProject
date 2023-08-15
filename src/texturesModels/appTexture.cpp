@@ -35,6 +35,7 @@ namespace appNamespace {
 	}
 	AppTexture::~AppTexture() {
 		vkDestroyImage(appDevice.device(), textureImage, nullptr);
+		vkDestroyImageView(appDevice.device(), textureImageView, nullptr);
 		vkFreeMemory(appDevice.device(), textureImageMemory, nullptr);
 	}
 	std::unique_ptr<AppTexture> AppTexture::createTextureFromFile(AppDevice& device, const std::string& filepath)
