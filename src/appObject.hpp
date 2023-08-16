@@ -17,7 +17,6 @@ namespace appNamespace {
         // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
         // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
 		glm::mat4 mat4();
-
 		glm::mat3 normalMatrix();
 	};
 	class AppObject {
@@ -38,6 +37,7 @@ namespace appNamespace {
 
 		std::shared_ptr<AppModel> model{};
 		std::shared_ptr<AppTexture> texture{};
+		std::vector<VkDescriptorSet>* textureDescriptors;
 		glm::vec4 color{};
 		TransformComponent transform{};
 		bool isVisible(/*FrameInfo& frameInfo*/);

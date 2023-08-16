@@ -33,8 +33,9 @@ namespace appNamespace {
 
 
 		std::unique_ptr<DescriptorPool> globalPool{};
+		std::unique_ptr<DescriptorPool> globalPool1{};
 		AppObject::Map appObjects;  
-		std::shared_ptr<AppTexture> texture;
-		std::unordered_map<std::string, AppTexture> _loadedTextures;
+		//std::shared_ptr<AppTexture> texture;
+		std::unordered_map<std::string, std::shared_ptr<AppTexture>> _loadedTextures;
 	};
 };

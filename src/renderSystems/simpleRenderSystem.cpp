@@ -56,12 +56,14 @@ namespace appNamespace {
 	}
 	void SimpleRenderSystem::renderAppObjects(FrameInfo& frameInfo)
 	{
+		
+		
 		appPipeline->bind(frameInfo.commandBuffer);
-		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
-			&frameInfo.globalDescriptorSet, 0, nullptr);
-
 		for (auto& kv : frameInfo.appObjects) {
 			auto& object = kv.second;
+			
+			vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
+			 &(*object.textureDescriptors)[frameInfo.frameIndex], 0, nullptr);
 			SimplePushConstantData push{};
 			push.modelMatrix = object.transform.mat4();
 			push.normalMatrix = object.transform.normalMatrix();

@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 
+#include <unordered_map>
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -42,7 +43,7 @@ namespace appNamespace {
         std::vector<VkDescriptorSet> globalDescriptorSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = texture->getTextureImageView();
+        imageInfo.imageView = this->_loadedTextures.at("tommy")->getTextureImageView();
         imageInfo.sampler = appDevice.getTextureSampler();
 
         for (int i = 0; i < globalDescriptorSets.size(); i++) {
@@ -52,11 +53,29 @@ namespace appNamespace {
                 .writeImage(1, &imageInfo)
                 .build(globalDescriptorSets[i]);
         }
+        appObjects[0].textureDescriptors = &globalDescriptorSets;
+
+        std::vector<VkDescriptorSet> globalDescriptorSets1(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
+        VkDescriptorImageInfo imageInfo1{};
+        imageInfo1.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo1.imageView = this->_loadedTextures.at("house")->getTextureImageView();
+        imageInfo1.sampler = appDevice.getTextureSampler();
+
+        for (int i = 0; i < globalDescriptorSets1.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            DescriptorWriter(*globalSetLayout, *globalPool1)
+                .writeBuffer(0, &bufferInfo)
+                .writeImage(1, &imageInfo1)
+                .build(globalDescriptorSets1[i]);
+        }
+        for (int i = 1; i < appObjects.size(); i++) {
+            appObjects[i].textureDescriptors = &globalDescriptorSets1;
+        }
 
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout() };
-        UIRenderSystem UI_RenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
-            globalSetLayout->getDescriptorSetLayout() };
+        /*UIRenderSystem UI_RenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout() };*/
          
         AppCamera camera{};
         //camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
@@ -85,25 +104,13 @@ namespace appNamespace {
             auto dt = glm::min(frameTimeFull, MAX_FRAME_TIME);
             keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
-            camera.setViewYXZ((viewerObject).transform.translation, (viewerObject).transform.rotation);
-            //viewerObject.transform.translation
+            //camera.setViewYXZ((viewerObject).transform.translation, (viewerObject).transform.rotation);
             camera.set3rdPersonCameraView(
                 cameraDistanceToPlayer, viewerObject.transform.translation, (viewerObject).transform.rotation);
-            //camera.setViewTarget((viewerObject).transform.translation + cameraDistanceToPlayer, appObjects[0].transform.translation);
             appObjects[0].transform.translation.x = viewerObject.transform.translation.x;
             appObjects[0].transform.translation.y = viewerObject.transform.translation.y;
             appObjects[0].transform.translation.z = viewerObject.transform.translation.z;
-            //appObjects[0].transform.translation = viewerObject.transform.translation;
-            //appObjects[0].transform.rotation = viewerObject.transform.rotation;
-
-            //appObjects[0].transform.rotation.x = 3.14 - viewerObject.transform.rotation.x;
             appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
-            //appObjects[0].transform.rotation.z = viewerObject.transform.rotation.z;
-            /*keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, *viewerObject);
-            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, *viewerObject);
-            camera.setViewYXZ((*viewerObject).transform.translation + cameraDistanceToPlayer,
-                            (*viewerObject).transform.rotation * cameraRotation);*/
-            //camera.setViewDirection((*viewerObject).transform.translation + cameraDistanceToPlayer, (*viewerObject).transform.rotation);
             float aspect = appRenderer.getAspectRatio();
             
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
@@ -145,6 +152,11 @@ namespace appNamespace {
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .build();
+        globalPool1 = DescriptorPool::Builder(appDevice)
+            .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+            .build();
 		loadObjects();
         loadTextures();
 	}
@@ -153,12 +165,14 @@ namespace appNamespace {
 	}  
 
     void Application::loadObjects() {
+        
         int n = 1;
         std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./models/tommy.obj");
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 1; i++) {
                 auto player = AppObject::createAppObject();
                 player.model = appModel1;
+                player.texture = this->_loadedTextures["tommy"];
                 player.transform.translation = { 0, 0.0, 0 };
                 player.transform.rotation = { 3.14, 3.14f , 0.0};
                 //house.transform.rotation = { 3.14, 0.0, 0.0f };
@@ -167,13 +181,14 @@ namespace appNamespace {
                 appObjects.emplace(player.getId(), std::move(player));
             }
         }
-
+        n = 10;
         std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/House.obj");
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto house = AppObject::createAppObject();
                 house.model = appModel;
-                house.transform.translation = { -n*10/2 + 10 * i + 5, 5, -n * 10/2 + 10 * j + 5};
+                //house.texture = this->_loadedTextures["house"];
+                house.transform.translation = { -n*10/2 + 10 * i/1.5 + 5, 5, -n * 10/2 + 10 * j/1.5 + 5};
                 //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
                 house.transform.rotation = { 3.14, 0.0, 0.0f };
                 house.transform.scale = { 0.5f, 0.5f, 0.5f };
@@ -186,8 +201,11 @@ namespace appNamespace {
     }
     void Application::loadTextures()
     {
+        //texture = ;
+        this->_loadedTextures["tommy"] = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
+        this->_loadedTextures["house"] = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");
         //texture = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");
-        texture = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
+        
     }
     
 };
