@@ -26,6 +26,7 @@ namespace appNamespace {
 
 		static std::unique_ptr<AppTexture> createTextureFromFile(AppDevice& device, const std::string& filepath);
 		VkImageView getTextureImageView() { return textureImageView; }
+		std::vector<VkDescriptorSet>* textureDescriptors;
 	private:
 		void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
 			VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);

@@ -31,11 +31,8 @@ namespace appNamespace {
 		AppDevice appDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, appDevice };
 
-
-		std::unique_ptr<DescriptorPool> globalPool{};
-		std::unique_ptr<DescriptorPool> globalPool1{};
-		AppObject::Map appObjects;  
-		//std::shared_ptr<AppTexture> texture;
+		std::unordered_map<std::string, std::unique_ptr<DescriptorPool>> globalPools;
+		AppObject::Map appObjects;
 		std::unordered_map<std::string, std::shared_ptr<AppTexture>> _loadedTextures;
 	};
 };

@@ -40,37 +40,25 @@ namespace appNamespace {
             .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1)
             .build();
 
+        std::unordered_map<std::string, std::vector<VkDescriptorSet>> unorderedMapOfglobalDescriptorSets;
+        for (auto& texture : this->_loadedTextures){
+            unorderedMapOfglobalDescriptorSets.emplace(texture.first, std::vector<VkDescriptorSet>(2));
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = texture.second->getTextureImageView();
+            imageInfo.sampler = appDevice.getTextureSampler();
+
+            for (int j = 0; j < unorderedMapOfglobalDescriptorSets.at(texture.first).size(); j++) {
+                auto bufferInfo = uboBuffers[j]->descriptorInfo();
+                DescriptorWriter(*globalSetLayout, *this->globalPools.at(texture.first))
+                    .writeBuffer(0, &bufferInfo)
+                    .writeImage(1, &imageInfo)
+                    .build(unorderedMapOfglobalDescriptorSets.at(texture.first)[j]);
+            }
+            texture.second->textureDescriptors = &unorderedMapOfglobalDescriptorSets.at(texture.first);
+        }
         std::vector<VkDescriptorSet> globalDescriptorSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = this->_loadedTextures.at("tommy")->getTextureImageView();
-        imageInfo.sampler = appDevice.getTextureSampler();
-
-        for (int i = 0; i < globalDescriptorSets.size(); i++) {
-            auto bufferInfo = uboBuffers[i]->descriptorInfo();
-            DescriptorWriter(*globalSetLayout, *globalPool)
-                .writeBuffer(0, &bufferInfo)
-                .writeImage(1, &imageInfo)
-                .build(globalDescriptorSets[i]);
-        }
-        appObjects[0].textureDescriptors = &globalDescriptorSets;
-
-        std::vector<VkDescriptorSet> globalDescriptorSets1(AppSwapChain::MAX_FRAMES_IN_FLIGHT);
-        VkDescriptorImageInfo imageInfo1{};
-        imageInfo1.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo1.imageView = this->_loadedTextures.at("house")->getTextureImageView();
-        imageInfo1.sampler = appDevice.getTextureSampler();
-
-        for (int i = 0; i < globalDescriptorSets1.size(); i++) {
-            auto bufferInfo = uboBuffers[i]->descriptorInfo();
-            DescriptorWriter(*globalSetLayout, *globalPool1)
-                .writeBuffer(0, &bufferInfo)
-                .writeImage(1, &imageInfo1)
-                .build(globalDescriptorSets1[i]);
-        }
-        for (int i = 1; i < appObjects.size(); i++) {
-            appObjects[i].textureDescriptors = &globalDescriptorSets1;
-        }
+        
 
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout() };
@@ -78,16 +66,14 @@ namespace appNamespace {
             globalSetLayout->getDescriptorSetLayout() };*/
          
         AppCamera camera{};
-        //camera.setViewTarget(glm::vec3{ -1.0f, -2.0f, 2.0f }, glm::vec3{0.0f, 0.0f, 2.5f});
         glm::vec3 cameraDistanceToPlayer = { 0.0f, -2.0f, -1.5f };
-        //glm::vec3 cameraRotation = { 2.5f, 3.14f, 0.0f };
+        //glm::vec3 cameraRotation = { -3.14f, -3.14f, 0.0f };
         glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
-        viewerObject.transform.translation.x = appObjects[0].transform.translation.x;
-        viewerObject.transform.translation.y = appObjects[0].transform.translation.y;
-        viewerObject.transform.translation.z = appObjects[0].transform.translation.z;
-        viewerObject.transform.translation += cameraDistanceToPlayer;
-        viewerObject.transform.rotation = { cameraRotation.x, cameraRotation.y, cameraRotation.z };
+        //&appObjects[0].transform.translation = viewerObject.transform.translation;
+        //viewerObject.transform.translation = appObjects[0].transform.translation;
+        //viewerObject.transform.translation += cameraDistanceToPlayer;
+        //viewerObject.transform.rotation = cameraRotation;
         //AppObject * viewerObject = &appObjects[0];
         KeyboardController keyboardCameraController{};
         MouseController mouseCameraController{appWindow.getGLFWwindow(), true};
@@ -106,11 +92,11 @@ namespace appNamespace {
             mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             //camera.setViewYXZ((viewerObject).transform.translation, (viewerObject).transform.rotation);
             camera.set3rdPersonCameraView(
-                cameraDistanceToPlayer, viewerObject.transform.translation, (viewerObject).transform.rotation);
-            appObjects[0].transform.translation.x = viewerObject.transform.translation.x;
-            appObjects[0].transform.translation.y = viewerObject.transform.translation.y;
-            appObjects[0].transform.translation.z = viewerObject.transform.translation.z;
+                cameraDistanceToPlayer, (viewerObject).transform.translation,
+                (viewerObject).transform.rotation);
+            appObjects[0].transform.translation = viewerObject.transform.translation;
             appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
+
             float aspect = appRenderer.getAspectRatio();
             
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
@@ -147,7 +133,7 @@ namespace appNamespace {
 	}
 	Application::Application()
 	{   
-        globalPool = DescriptorPool::Builder(appDevice)
+        /*globalPool = DescriptorPool::Builder(appDevice)
             .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -156,9 +142,17 @@ namespace appNamespace {
             .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
             .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
-            .build();
-		loadObjects();
+            .build();*/
+		
         loadTextures();
+        loadObjects();
+        for (auto &texture: this->_loadedTextures) {
+            this->globalPools.emplace(texture.first, DescriptorPool::Builder(appDevice)
+                .setMaxSets(AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, AppSwapChain::MAX_FRAMES_IN_FLIGHT)
+                .build());
+        }
 	}
 	Application::~Application(){
 
@@ -187,7 +181,7 @@ namespace appNamespace {
             for (int i = 0; i < n; i++) {
                 auto house = AppObject::createAppObject();
                 house.model = appModel;
-                //house.texture = this->_loadedTextures["house"];
+                house.texture = this->_loadedTextures["house"];
                 house.transform.translation = { -n*10/2 + 10 * i/1.5 + 5, 5, -n * 10/2 + 10 * j/1.5 + 5};
                 //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
                 house.transform.rotation = { 3.14, 0.0, 0.0f };
@@ -201,11 +195,8 @@ namespace appNamespace {
     }
     void Application::loadTextures()
     {
-        //texture = ;
         this->_loadedTextures["tommy"] = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
-        this->_loadedTextures["house"] = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");
-        //texture = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");
-        
+        this->_loadedTextures["house"] = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");        
     }
     
 };

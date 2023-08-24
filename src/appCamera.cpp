@@ -69,10 +69,11 @@ namespace appNamespace{
         }
         std::cout << "\n";
     };
-    void AppCamera::set3rdPersonCameraView(glm::vec3 relativePosition, glm::vec3 person, glm::vec3 rotation, glm::vec3 up)
+    void AppCamera::set3rdPersonCameraView(glm::vec3 relativePosition, glm::vec3 person,
+        glm::vec3 rotation)
     {
         //rotation.x = 0;
-        //rotation.y = 3.14 / 4;
+        //rotation.y += +3.14;
         //rotation.z = 0;
         //const float rx = rotation.x - 0.5;
         /*const float c3 = glm::cos(rotation.z);
