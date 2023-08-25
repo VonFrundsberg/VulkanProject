@@ -63,6 +63,7 @@ namespace appNamespace {
 		auto previousTexture = object.second.texture;
 		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
 			&(*object.second.texture->textureDescriptors)[frameInfo.frameIndex], 0, nullptr);
+
 		for (auto& kv : frameInfo.appObjects) {
 			auto& object = kv.second;
 			if (previousTexture != object.texture) {
@@ -79,20 +80,6 @@ namespace appNamespace {
 			object.model->draw(frameInfo.commandBuffer);
 
 		}
-		/*for (auto& kv : frameInfo.appObjects) {
-			auto& object = kv.second;
-			vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
-			 &(*object.textureDescriptors)[frameInfo.frameIndex], 0, nullptr);
-			SimplePushConstantData push{};
-			push.modelMatrix = object.transform.mat4();
-			push.normalMatrix = object.transform.normalMatrix();
-			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
-				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
-				&push);
-			object.model->bind(frameInfo.commandBuffer);
-			object.model->draw(frameInfo.commandBuffer);
-			
-		}*/
 	}
 };
 

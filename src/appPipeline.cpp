@@ -17,10 +17,10 @@ namespace appNamespace {
 	AppPipeline::~AppPipeline() {
 		vkDestroyShaderModule(appDevice.device(), VertShaderModule, nullptr);
 		vkDestroyShaderModule(appDevice.device(), FragShaderModule, nullptr);
-		vkDestroyPipeline(appDevice.device(), GraphicsPipeline, nullptr);
+		vkDestroyPipeline(appDevice.device(), graphicsPipeline, nullptr);
 	}
 	void AppPipeline::bind(VkCommandBuffer commandBuffer){
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, GraphicsPipeline);
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 	}
 	void AppPipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo)
 	{
@@ -166,7 +166,7 @@ namespace appNamespace {
 		
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-		if (vkCreateGraphicsPipelines(appDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &GraphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(appDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("graphics pipeline failed to be created!");
 		}
 

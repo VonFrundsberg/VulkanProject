@@ -70,7 +70,9 @@ namespace appNamespace {
 		renderPassInfo.renderArea.extent = appSwapChain->getSwapChainExtent();
 
 		std::array<VkClearValue, 2> clearValues{};
-		clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
+		//royal blue(65,105,255)
+		//dark blue (0, 0, 139)
+		clearValues[0].color = { 0.0/255.0, 0.0 / 255.0, 139.0 / 255.0, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 		renderPassInfo.pClearValues = clearValues.data();

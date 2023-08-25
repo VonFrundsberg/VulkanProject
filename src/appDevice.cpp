@@ -62,11 +62,11 @@ namespace appNamespace {
 		vkDestroyDevice(device_, nullptr);
 
 		if (enableValidationLayers) {
-			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+			DestroyDebugUtilsMessengerEXT(_instance, debugMessenger, nullptr);
 		}
 
-		vkDestroySurfaceKHR(instance, surface_, nullptr);
-		vkDestroyInstance(instance, nullptr);
+		vkDestroySurfaceKHR(_instance, surface_, nullptr);
+		vkDestroyInstance(_instance, nullptr);
 	}
 
 	void AppDevice::createInstance() {
@@ -108,7 +108,7 @@ namespace appNamespace {
 			createInfo.pNext = nullptr;
 		}
 
-		if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+		if (vkCreateInstance(&createInfo, nullptr, &_instance) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create instance!");
 		}
 
@@ -117,31 +117,31 @@ namespace appNamespace {
 
 	void AppDevice::pickPhysicalDevice() {
 		uint32_t deviceCount = 0;
-		vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+		vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
 		if (deviceCount == 0) {
 			throw std::runtime_error("failed to find GPUs with Vulkan support!");
 		}
 		std::cout << "Device count: " << deviceCount << std::endl;
 		std::vector<VkPhysicalDevice> devices(deviceCount);
-		vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+		vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
 
 		for (const auto& device : devices) {
 			if (isDeviceSuitable(device)) {
-				physicalDevice = device;
+				_physicalDevice = device;
 				break;
 			}
 		}
 
-		if (physicalDevice == VK_NULL_HANDLE) {
+		if (_physicalDevice == VK_NULL_HANDLE) {
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
 
-		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+		vkGetPhysicalDeviceProperties(_physicalDevice, &properties);
 		std::cout << "physical device: " << properties.deviceName << std::endl;
 	}
 
 	void AppDevice::createLogicalDevice() {
-		QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+		QueueFamilyIndices indices = findQueueFamilies(_physicalDevice);
 
 		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 		std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily, indices.presentFamily };
@@ -179,7 +179,7 @@ namespace appNamespace {
 			createInfo.enabledLayerCount = 0;
 		}
 
-		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) {
+		if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create logical device!");
 		}
 
@@ -201,7 +201,7 @@ namespace appNamespace {
 		}
 	}
 
-	void AppDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
+	void AppDevice::createSurface() { window.createWindowSurface(_instance, &surface_); }
 
 	bool AppDevice::isDeviceSuitable(VkPhysicalDevice device) {
 		QueueFamilyIndices indices = findQueueFamilies(device);
@@ -238,7 +238,7 @@ namespace appNamespace {
 		if (!enableValidationLayers) return;
 		VkDebugUtilsMessengerCreateInfoEXT createInfo;
 		populateDebugMessengerCreateInfo(createInfo);
-		if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+		if (CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
 			throw std::runtime_error("failed to set up debug messenger!");
 		}
 	}
@@ -393,7 +393,7 @@ namespace appNamespace {
 		const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
 		for (VkFormat format : candidates) {
 			VkFormatProperties props;
-			vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+			vkGetPhysicalDeviceFormatProperties(_physicalDevice, format, &props);
 
 			if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
 				return format;
@@ -408,7 +408,7 @@ namespace appNamespace {
 
 	uint32_t AppDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
 		VkPhysicalDeviceMemoryProperties memProperties;
-		vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+		vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
 		for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
 			if ((typeFilter & (1 << i)) &&
 				(memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -478,7 +478,7 @@ namespace appNamespace {
 		samplerInfo.anisotropyEnable = VK_TRUE;
 
 		VkPhysicalDeviceProperties properties{};
-		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+		vkGetPhysicalDeviceProperties(_physicalDevice, &properties);
 		samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
 		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
 		samplerInfo.unnormalizedCoordinates = VK_FALSE;
@@ -495,8 +495,8 @@ namespace appNamespace {
 	}
 
 	void AppDevice::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
-		vkEndCommandBuffer(commandBuffer);
 
+		vkEndCommandBuffer(commandBuffer);
 		VkSubmitInfo submitInfo{};
 		submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submitInfo.commandBufferCount = 1;

@@ -41,10 +41,11 @@ namespace appNamespace {
 		VkQueue graphicsQueue() { return graphicsQueue_; }
 		VkQueue presentQueue() { return presentQueue_; }
 		VkSampler getTextureSampler() { return textureSampler_; }
-
-		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(physicalDevice); }
+		VkInstance getInstance() { return _instance; }
+		VkPhysicalDevice getPhysicalDevice() { return _physicalDevice; }
+		SwapChainSupportDetails getSwapChainSupport() { return querySwapChainSupport(_physicalDevice); }
 		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-		QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(physicalDevice); }
+		QueueFamilyIndices findPhysicalQueueFamilies() { return findQueueFamilies(_physicalDevice); }
 		VkFormat findSupportedFormat(
 			const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
@@ -90,9 +91,9 @@ namespace appNamespace {
 		//void setDeviceExtensions();
 		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
-		VkInstance instance;
+		VkInstance _instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
 		AppWindow& window;
 		VkCommandPool commandPool;
 		VkSampler textureSampler_;

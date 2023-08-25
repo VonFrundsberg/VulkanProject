@@ -1,5 +1,4 @@
 #pragma once
-
 #include "src/appWindow.hpp"
 #include "src/appDevice.hpp"
 #include "src/appRenderer.hpp"
@@ -27,10 +26,11 @@ namespace appNamespace {
 	private:
 		void loadObjects();
 		void loadTextures();
+		VkAllocationCallbacks* g_Allocator{ nullptr };
+
 		AppWindow appWindow{ WIDTH, HEIGHT, "Application name" };
 		AppDevice appDevice{ appWindow };
 		AppRenderer appRenderer{ appWindow, appDevice };
-
 		std::unordered_map<std::string, std::unique_ptr<DescriptorPool>> globalPools;
 		AppObject::Map appObjects;
 		std::unordered_map<std::string, std::shared_ptr<AppTexture>> _loadedTextures;

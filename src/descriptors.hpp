@@ -67,6 +67,7 @@ namespace appNamespace {
         DescriptorPool(const DescriptorPool&) = delete;
         DescriptorPool& operator=(const DescriptorPool&) = delete;
 
+        VkDescriptorPool getDescriptorPool() { return descriptorPool; }
         bool allocateDescriptor(
             const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
 
