@@ -10,7 +10,6 @@ namespace appNamespace{
         float frameTime;
         VkCommandBuffer commandBuffer;
         AppCamera& camera;
-        VkDescriptorSet globalDescriptorSet;
         AppObject::Map& appObjects;
     };
 } 
