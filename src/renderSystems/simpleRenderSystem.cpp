@@ -63,7 +63,6 @@ namespace appNamespace {
 		auto previousTexture = object.second.texture;
 		vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
 			&(*object.second.texture->textureDescriptors)[frameInfo.frameIndex], 0, nullptr);
-
 		for (auto& kv : frameInfo.appObjects) {
 			auto& object = kv.second;
 			if (previousTexture != object.texture) {
@@ -79,6 +78,7 @@ namespace appNamespace {
 				&push);
 			object.model->bind(frameInfo.commandBuffer);
 			object.model->draw(frameInfo.commandBuffer);
+			previousTexture = object.texture;
 
 		}
 	}

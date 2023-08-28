@@ -105,7 +105,7 @@ namespace appNamespace {
             appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
             //appObjects[0].transform.normalMatrix
             float aspect = appRenderer.getAspectRatio();
-            appObjects[rand() % appObjects.size()].isTarget = true;
+            appObjects[rand() % appObjects.size()].isTarget = 2;
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
@@ -127,7 +127,7 @@ namespace appNamespace {
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
 
     			simpleRenderSystem.renderAppObjects(frameInfo);      
-                imGuiRendering.render(frameInfo);
+                //imGuiRendering.render(frameInfo);
 
 ;				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
@@ -187,7 +187,7 @@ namespace appNamespace {
                 house.model = appModel;
                 house.texture = this->_loadedTextures["house"];
                 //-45
-                house.transform.translation = { -n*d/2 + d * i + d/2 + d* 20, 130, -n * d/2 + d * j + d/2 + d*20};
+                house.transform.translation = { -n*d/2 + d * i + d/2 , 30, -n * d/2 + d * j + d/2};
                 //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
                 house.transform.rotation = { 3.14, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
