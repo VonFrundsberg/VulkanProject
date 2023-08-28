@@ -19,10 +19,11 @@ namespace appNamespace {
 
 		ImGuiRenderSystem(const ImGuiRenderSystem&) = delete;
 		ImGuiRenderSystem& operator=(const ImGuiRenderSystem&) = delete;
-		void renderDemo(VkCommandBuffer& commandBuffer, bool show_demo_window=true);
-		void render(VkCommandBuffer& commandBuffer);
+		void showDemo(bool show_demo_window=true);
+		void render(FrameInfo& frameInfo);
 	private:
 		ImGuiIO io{};
+		void appObjectsList(AppObject::Map& appObjects);
 		/*AppDevice &appDevice;
 		std::unique_ptr<AppPipeline> appPipeline;
 		VkPipelineLayout pipelineLayout;*/

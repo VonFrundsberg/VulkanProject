@@ -42,6 +42,7 @@ namespace appNamespace {
 		TransformComponent transform{};
 		bool isVisible(/*FrameInfo& frameInfo*/);
 		AppObject() {};
+		int isTarget = 0;
 	private:
 		AppObject(id_t objectId) : id{ objectId } {};
 		id_t id;

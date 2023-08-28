@@ -79,9 +79,10 @@ namespace appNamespace {
         glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
         viewerObject.transform.translation = { 0.0f, -50.0f, 0.0f };
+        appObjects[0].isTarget = 1;
 
-        //KeyboardController keyboardCameraController{};
-        //MouseController mouseCameraController{appWindow.getGLFWwindow(), false};
+        KeyboardController keyboardCameraController{};
+        MouseController mouseCameraController{appWindow.getGLFWwindow(), false};
 
         auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -94,17 +95,17 @@ namespace appNamespace {
             //std::cout << 1.0 / abs(frameTimeFull) << std::endl;
             //std::cout << "total time passed: " << abs(frameTimeFull) << std::endl;
             auto dt = glm::min(frameTimeFull, MAX_FRAME_TIME);
-            //keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
-            //mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
+            keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
+            mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             //camera.setViewYXZ((viewerObject).transform.translation, (viewerObject).transform.rotation);
             camera.set3rdPersonCameraView(
                 cameraDistanceToPlayer, (viewerObject).transform.translation,
                 (viewerObject).transform.rotation);
             appObjects[0].transform.translation = viewerObject.transform.translation;
             appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
-
+            //appObjects[0].transform.normalMatrix
             float aspect = appRenderer.getAspectRatio();
-            
+            appObjects[rand() % appObjects.size()].isTarget = true;
             camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.01f, 1000.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
@@ -125,9 +126,8 @@ namespace appNamespace {
                 //render
 				appRenderer.beginSwapChainRenderPass(commandBuffer);
 
-    			simpleRenderSystem.renderAppObjects(frameInfo);          
-                //imGuiRendering.renderDemo(commandBuffer);
-                imGuiRendering.render(commandBuffer);
+    			simpleRenderSystem.renderAppObjects(frameInfo);      
+                imGuiRendering.render(frameInfo);
 
 ;				appRenderer.endSwapChainRenderPass(commandBuffer);
 				appRenderer.endFrame();
@@ -142,7 +142,6 @@ namespace appNamespace {
 	}
 	Application::Application()
 	{   
-	
         loadTextures();
         loadObjects();
 
@@ -179,21 +178,23 @@ namespace appNamespace {
                 appObjects.emplace(player.getId(), std::move(player));
             }
         }
-        //n = 10;
-        //std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/House.obj");
-        //for (int j = 0; j < n; j++) {
-        //    for (int i = 0; i < n; i++) {
-        //        auto house = AppObject::createAppObject();
-        //        house.model = appModel;
-        //        house.texture = this->_loadedTextures["house"];
-        //        house.transform.translation = { -n*10/2 + 10 * i/1.5 + 5, 5, -n * 10/2 + 10 * j/1.5 + 5};
-        //        //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-        //        house.transform.rotation = { 3.14, 0.0, 0.0f };
-        //        house.transform.scale = { 0.5f, 0.5f, 0.5f };
-        //        //cube.transform.scale = { 2.0f, 2.0f, 2.0f };
-        //        appObjects.emplace(house.getId(), std::move(house));
-        //    }
-        //}
+        n = 30;
+        int d = 20;
+        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/House.obj");
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
+                auto house = AppObject::createAppObject();
+                house.model = appModel;
+                house.texture = this->_loadedTextures["house"];
+                //-45
+                house.transform.translation = { -n*d/2 + d * i + d/2 + d* 20, 130, -n * d/2 + d * j + d/2 + d*20};
+                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
+                house.transform.rotation = { 3.14, 0.0, 0.0f };
+                //house.transform.scale = { 0.5f, 0.5f, 0.5f };
+                house.transform.scale = { 2.0f, 2.0f, 2.0f };
+                appObjects.emplace(house.getId(), std::move(house));
+            }
+        }
         //std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/tree1.obj");
         //for (int j = 0; j < n; j++) {
         //    for (int i = 0; i < n; i++) {

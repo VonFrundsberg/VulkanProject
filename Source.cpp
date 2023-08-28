@@ -1,11 +1,13 @@
 #include "Application.hpp"
+#include <chrono>
+#include <thread>
 #include <iostream>
 
 
 int main() {
 
 	appNamespace::Application app;
-
+	system("shaders\\compileFromSrc.bat");
 	try {
 		app.run();
 	}

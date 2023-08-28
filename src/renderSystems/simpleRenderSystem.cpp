@@ -73,6 +73,7 @@ namespace appNamespace {
 			SimplePushConstantData push{};
 			push.modelMatrix = object.transform.mat4();
 			push.normalMatrix = object.transform.normalMatrix();
+			push.normalMatrix[3][3] = object.isTarget;
 			vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
 				VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(SimplePushConstantData),
 				&push);
