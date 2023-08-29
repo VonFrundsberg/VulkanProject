@@ -9,7 +9,9 @@
 
 namespace appNamespace {
 
-	AppTexture::AppTexture(AppDevice& device, const AppTexture::TextureInfo& texInfo) : appDevice(device) {
+	AppTexture::AppTexture
+	(AppDevice& device, const AppTexture::TextureInfo& texInfo, const std::string& textureName)
+		: appDevice(device), name(textureName) {
 		uint32_t elementSize = 4;
 		uint32_t elementsCount = texInfo.texWidth * texInfo.texHeight;
 		VkDeviceSize bufferSize = elementsCount * elementSize;
@@ -38,11 +40,12 @@ namespace appNamespace {
 		vkDestroyImageView(appDevice.device(), textureImageView, nullptr);
 		vkFreeMemory(appDevice.device(), textureImageMemory, nullptr);
 	}
-	std::unique_ptr<AppTexture> AppTexture::createTextureFromFile(AppDevice& device, const std::string& filepath)
+	std::unique_ptr<AppTexture> AppTexture::createTextureFromFile
+	(AppDevice& device, const std::string& filepath, const std::string &textureName)
 	{
 		AppTexture::TextureInfo texInfo{};
 		texInfo.loadTexture(filepath);
-		return std::make_unique<AppTexture>(device, texInfo);
+		return std::make_unique<AppTexture>(device, texInfo, textureName);
 	}
 	void AppTexture::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
 		VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {

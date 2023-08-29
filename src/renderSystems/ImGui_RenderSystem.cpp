@@ -71,7 +71,7 @@ namespace appNamespace {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		showDemo(true);
+		//showDemo(true);
 		appObjectsList(frameInfo.appObjects);
 
 		ImGui::Render();
@@ -123,16 +123,16 @@ namespace appNamespace {
 		//auto& objectPrev = appObjects.at(item_current_idx);
 		//objectPrev.isTarget = 0;
 
-		if (ImGui::BeginListBox("listbox 1"))
+		if (ImGui::BeginListBox("App objects list"))
 		{
-			for (int n = 0; n < appObjects.size(); n++)
+			for (auto & object: appObjects)
 			{
-				const bool is_selected = (item_current_idx == n);
-				if (ImGui::Selectable(std::to_string(n).c_str(), is_selected)) {
+				const bool is_selected = (item_current_idx == object.first);
+				if (ImGui::Selectable(std::to_string(object.first).c_str(), is_selected)) {
 					auto& objectPrev = appObjects.at(item_current_idx);
 					objectPrev.isTarget = 0;
 
-					item_current_idx = n;
+					item_current_idx = object.first;
 
 					auto& object = appObjects.at(item_current_idx);
 					object.isTarget = 1;
@@ -143,15 +143,33 @@ namespace appNamespace {
 			}
 			ImGui::EndListBox();
 		}
-
+		
 		ImGui::InputFloat3("position", glm::value_ptr(appObjects.at(item_current_idx).transform.translation));
 		ImGui::InputFloat3("rotation", glm::value_ptr(appObjects.at(item_current_idx).transform.rotation));
 		ImGui::InputFloat3("scale", glm::value_ptr(appObjects.at(item_current_idx).transform.scale));
-		//ImGui::InputFloat("translation x", &(appObjects.at(item_current_idx)
-		//										.transform.translation.x), 0.01f, 1.0f, "%.3f");
+		//ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
+		char* str = appObjects.at(item_current_idx).texture->getName().data();
+		ImGui::InputText("texture", str, IM_ARRAYSIZE(str));
 
-		//ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4);
+		static int clicked = 0;
+		if (ImGui::Button("Add copy of target"))
+			clicked++;
+		if (clicked & 1)
+		{
+			auto object = AppObject::createAppObject();
+			//-45
+			object.transform.translation = { 0 ,0, 0};
+			object.model = appObjects.at(item_current_idx).model;
+			object.texture = appObjects.at(item_current_idx).texture;
+			//cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
+			object.transform.rotation = { 3.14, 0.0, 0.0f };
+			//house.transform.scale = { 0.5f, 0.5f, 0.5f };
+			object.transform.scale = { 2.0f, 2.0f, 2.0f };
+			appObjects.emplace(object.getId(), std::move(object));
+			clicked = 0;
+		}
 		ImGui::End();
+
 	}
 };
 

@@ -78,7 +78,7 @@ namespace appNamespace {
         //glm::vec3 cameraRotation = { -3.14f, -3.14f, 0.0f };
         glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
-        viewerObject.transform.translation = { 0.0f, -50.0f, 0.0f };
+        //viewerObject.transform.translation = { 0.0f, -50.0f, 0.0f };
 
         KeyboardController keyboardCameraController{};
         MouseController mouseCameraController{appWindow.getGLFWwindow(), false};
@@ -177,7 +177,7 @@ namespace appNamespace {
                 appObjects.emplace(player.getId(), std::move(player));
             }
         }
-        n = 30;
+        n = 1;
         int d = 20;
         std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./models/House.obj");
         for (int j = 0; j < n; j++) {
@@ -186,7 +186,7 @@ namespace appNamespace {
                 house.model = appModel;
                 house.texture = this->_loadedTextures["house"];
                 //-45
-                house.transform.translation = { -n*d/2 + d * i + 15*d , 400, -n * d/2 + d * j + 15*d};
+                house.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};
                 //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
                 house.transform.rotation = { 3.14, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
@@ -213,10 +213,14 @@ namespace appNamespace {
     }
     void Application::loadTextures()
     {
-        this->_loadedTextures["tommy"] = AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png");
-        this->_loadedTextures["mountain"] = AppTexture::createTextureFromFile(appDevice, "./textures/ground_grass.jpg");
-        this->_loadedTextures["tree"] = AppTexture::createTextureFromFile(appDevice, "./textures/tree1.jpg");
-        this->_loadedTextures["house"] = AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png");        
+        this->_loadedTextures["tommy"] = 
+            AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png", "tommy");
+        this->_loadedTextures["mountain"] = 
+            AppTexture::createTextureFromFile(appDevice, "./textures/ground_grass.jpg");
+        this->_loadedTextures["tree"] = 
+            AppTexture::createTextureFromFile(appDevice, "./textures/tree1.jpg");
+        this->_loadedTextures["house"] = 
+            AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png", "house");
     }
     
 };
