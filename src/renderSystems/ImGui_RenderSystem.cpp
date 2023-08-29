@@ -1,4 +1,5 @@
 #include "ImGui_RenderSystem.hpp"
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <array>
 
@@ -70,8 +71,8 @@ namespace appNamespace {
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		//showDemo(true);
-		//appObjectsList(frameInfo.appObjects);
+		showDemo(true);
+		appObjectsList(frameInfo.appObjects);
 
 		ImGui::Render();
 		ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), frameInfo.commandBuffer, 0);
@@ -111,27 +112,43 @@ namespace appNamespace {
 		ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Once);
 
 		ImGui::Begin("Application objects", &p_open, window_flags);
-		std::vector<std::string> items{};
-		for (auto& object : appObjects) {
-			items.push_back(std::to_string(object.first));
-		}
+		//std::vector<int> items{};
+		//for (auto& object : appObjects) {
+		//	items.push_back(object.first);
+		//}
 
+
+		//static int item_previous_idx = 0;
 		static int item_current_idx = 0;
+		//auto& objectPrev = appObjects.at(item_current_idx);
+		//objectPrev.isTarget = 0;
 
 		if (ImGui::BeginListBox("listbox 1"))
 		{
-			for (int n = 0; n < items.size(); n++)
+			for (int n = 0; n < appObjects.size(); n++)
 			{
 				const bool is_selected = (item_current_idx == n);
-				if (ImGui::Selectable(items[n].c_str(), is_selected))
+				if (ImGui::Selectable(std::to_string(n).c_str(), is_selected)) {
+					auto& objectPrev = appObjects.at(item_current_idx);
+					objectPrev.isTarget = 0;
+
 					item_current_idx = n;
 
+					auto& object = appObjects.at(item_current_idx);
+					object.isTarget = 1;
+				}
 				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
 				if (is_selected)
 					ImGui::SetItemDefaultFocus();
 			}
 			ImGui::EndListBox();
 		}
+
+		ImGui::InputFloat3("position", glm::value_ptr(appObjects.at(item_current_idx).transform.translation));
+		ImGui::InputFloat3("rotation", glm::value_ptr(appObjects.at(item_current_idx).transform.rotation));
+		ImGui::InputFloat3("scale", glm::value_ptr(appObjects.at(item_current_idx).transform.scale));
+		//ImGui::InputFloat("translation x", &(appObjects.at(item_current_idx)
+		//										.transform.translation.x), 0.01f, 1.0f, "%.3f");
 
 		//ImGui::ListBox("listbox", &item_current, items, IM_ARRAYSIZE(items), 4);
 		ImGui::End();
