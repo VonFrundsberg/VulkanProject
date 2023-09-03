@@ -21,9 +21,6 @@
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_vulkan.h"
 
-
-#include "src/texturesModels/modelUtils.hpp"
-
 namespace appNamespace {
     struct GlobalUBO {
         alignas(16) glm::mat4 projectionView{ 1.0f };
@@ -127,7 +124,6 @@ namespace appNamespace {
 	}
 	Application::Application()
 	{
-        ModelUtils::readGLTF_FromFile("glTF/cube.gltf");
         loadTextures();
         loadObjects();
 
