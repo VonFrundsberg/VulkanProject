@@ -20,17 +20,16 @@
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_vulkan.h"
-//#ifdef _DEBUG
-//#define IMGUI_VULKAN_DEBUG_REPORT
-//#endif
 
 
+#include "src/texturesModels/modelUtils.hpp"
 
 namespace appNamespace {
     struct GlobalUBO {
         alignas(16) glm::mat4 projectionView{ 1.0f };
         alignas(16) glm::vec3 directionToLight = glm::normalize(glm::vec3{ 1.0f, 1.0f, 1.0f });
     };
+
 
 
 	void Application::run()
@@ -49,29 +48,16 @@ namespace appNamespace {
             .build();
 
         std::unordered_map<std::string, std::vector<VkDescriptorSet>> unorderedMapOfglobalDescriptorSets;
-        for (auto& texture : this->_loadedTextures){
-            unorderedMapOfglobalDescriptorSets.emplace(texture.first, std::vector<VkDescriptorSet>(2));
-            VkDescriptorImageInfo imageInfo{};
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = texture.second->getTextureImageView();
-            imageInfo.sampler = appDevice.getTextureSampler();
 
-            for (int j = 0; j < unorderedMapOfglobalDescriptorSets.at(texture.first).size(); j++) {
-                auto bufferInfo = uboBuffers[j]->descriptorInfo();
-                DescriptorWriter(*globalSetLayout, *this->globalPools.at(texture.first))
-                    .writeBuffer(0, &bufferInfo)
-                    .writeImage(1, &imageInfo)
-                    .build(unorderedMapOfglobalDescriptorSets.at(texture.first)[j]);
-            }
-            texture.second->textureDescriptors = &unorderedMapOfglobalDescriptorSets.at(texture.first);
-        }
+
+        this->initDescriptorSets(unorderedMapOfglobalDescriptorSets, globalSetLayout, uboBuffers);
         
 
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout() };
         ImGuiRenderSystem imGuiRendering{ appWindow, appDevice,
             appRenderer.getSwapChainRenderPass(),
-            globalPools.at("ImGui")->getDescriptorPool() };
+            globalPools.at("ImGui")->getDescriptorPool()};
 
         AppCamera camera{};
         glm::vec3 cameraDistanceToPlayer = { 0.0f, -2.0f, -1.5f };
@@ -140,7 +126,8 @@ namespace appNamespace {
 		vkDeviceWaitIdle(appDevice.device());
 	}
 	Application::Application()
-	{   
+	{
+        ModelUtils::readGLTF_FromFile("glTF/cube.gltf");
         loadTextures();
         loadObjects();
 
@@ -221,6 +208,29 @@ namespace appNamespace {
             AppTexture::createTextureFromFile(appDevice, "./textures/tree1.jpg");
         this->_loadedTextures["house"] = 
             AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png", "house");
+    }
+
+    void Application::initDescriptorSets(
+        std::unordered_map<std::string, std::vector<VkDescriptorSet>> &unorderedMapOfglobalDescriptorSets,
+        const std::unique_ptr<DescriptorSetLayout>& globalSetLayout,
+        const std::vector<std::unique_ptr<Buffer>>& uboBuffers){
+
+        for (auto& texture : this->_loadedTextures) {
+            unorderedMapOfglobalDescriptorSets.emplace(texture.first, std::vector<VkDescriptorSet>(2));
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = texture.second->getTextureImageView();
+            imageInfo.sampler = appDevice.getTextureSampler();
+
+            for (int j = 0; j < unorderedMapOfglobalDescriptorSets.at(texture.first).size(); j++) {
+                auto bufferInfo = uboBuffers[j]->descriptorInfo();
+                DescriptorWriter(*globalSetLayout, *this->globalPools.at(texture.first))
+                    .writeBuffer(0, &bufferInfo)
+                    .writeImage(1, &imageInfo)
+                    .build(unorderedMapOfglobalDescriptorSets.at(texture.first)[j]);
+            }
+            texture.second->textureDescriptors = &unorderedMapOfglobalDescriptorSets.at(texture.first);
+        }
     }
     
 };

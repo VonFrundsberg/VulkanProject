@@ -112,16 +112,8 @@ namespace appNamespace {
 		ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Once);
 
 		ImGui::Begin("Application objects", &p_open, window_flags);
-		//std::vector<int> items{};
-		//for (auto& object : appObjects) {
-		//	items.push_back(object.first);
-		//}
 
-
-		//static int item_previous_idx = 0;
 		static int item_current_idx = 0;
-		//auto& objectPrev = appObjects.at(item_current_idx);
-		//objectPrev.isTarget = 0;
 
 		if (ImGui::BeginListBox("App objects list"))
 		{
@@ -161,9 +153,7 @@ namespace appNamespace {
 			object.transform.translation = { 0 ,0, 0};
 			object.model = appObjects.at(item_current_idx).model;
 			object.texture = appObjects.at(item_current_idx).texture;
-			//cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
 			object.transform.rotation = { 3.14, 0.0, 0.0f };
-			//house.transform.scale = { 0.5f, 0.5f, 0.5f };
 			object.transform.scale = { 2.0f, 2.0f, 2.0f };
 			appObjects.emplace(object.getId(), std::move(object));
 			clicked = 0;

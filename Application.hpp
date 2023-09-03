@@ -26,6 +26,10 @@ namespace appNamespace {
 	private:
 		void loadObjects();
 		void loadTextures();
+		void initDescriptorSets(
+			std::unordered_map<std::string, std::vector<VkDescriptorSet>>& unorderedMapOfglobalDescriptorSets,
+			const std::unique_ptr<DescriptorSetLayout>& globalSetLayout,
+			const std::vector<std::unique_ptr<Buffer>> &uboBuffers);
 		VkAllocationCallbacks* g_Allocator{ nullptr };
 
 		AppWindow appWindow{ WIDTH, HEIGHT, "Application name" };
