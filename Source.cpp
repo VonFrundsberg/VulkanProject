@@ -2,6 +2,8 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <vector>
+
 
 int main() {
 	appNamespace::Application app;
@@ -13,6 +15,5 @@ int main() {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
-
 	return EXIT_SUCCESS;
 }

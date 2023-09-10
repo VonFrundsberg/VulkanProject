@@ -2,6 +2,7 @@
 #include "appModel.hpp"
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
+#include <glTF_Loader.hpp>
 #include <cassert>
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -108,9 +109,9 @@ namespace appNamespace {
 										 attrib.vertices[3 * index.vertex_index + 1],
 										 attrib.vertices[3 * index.vertex_index + 2] };
 
-					vertex.color = { attrib.colors[3 * index.vertex_index + 0],
+					/*vertex.color = { attrib.colors[3 * index.vertex_index + 0],
 									attrib.colors[3 * index.vertex_index + 1],
-									attrib.colors[3 * index.vertex_index + 2] };
+									attrib.colors[3 * index.vertex_index + 2] };*/
 				}
 				if (index.normal_index >= 0) {
 					vertex.normal = { attrib.normals[3 * index.normal_index + 0],
@@ -133,10 +134,46 @@ namespace appNamespace {
 			}
 		}
 	}
+	void AppModel::Builder::load_glTF_Model(const std::string& filepath)
+	{
+
+		vertices.clear();
+		indices.clear();
+
+		auto gltfObject = GLTF_Loader(filepath);
+		std::vector<float> modelPositions;
+		gltfObject.getData(modelPositions, "Cube", "POSITION");
+
+		std::vector<float> modelNormals;
+		gltfObject.getData(modelNormals, "Cube", "NORMAL");
+
+		std::vector<float> modelUV;
+		gltfObject.getData(modelUV, "Cube", "TEXCOORD_0");
+
+		std::vector<unsigned short> modelIndices;
+		gltfObject.getData(modelIndices, "Cube", "indices");
+		indices.resize(modelIndices.size());
+
+		for (const auto& obj : modelIndices) {
+			indices.push_back(static_cast<uint32_t>(obj));
+		}
+
+		for (int i = 0; i < 24; i++) {
+			Vertex vertex{};
+			vertex.position = {modelPositions[3 * i + 0],
+								modelPositions[3 * i + 1],
+								modelPositions[3 * i + 2]};
+			vertex.normal = { modelNormals[3 * i + 0], modelNormals[3 * i + 1], modelNormals[3 * i + 2] };
+			vertex.uv = { modelUV[2 * i + 0], modelUV[2 * i + 1] };
+			vertex.color = { 1.0f, 1.0f, 1.0f };
+			vertices.push_back(vertex);
+		}
+	}
 	std::unique_ptr<AppModel> AppModel::createModelFromFile(AppDevice& device, const std::string& filepath)
 	{
 		AppModel::Builder builder{};
-		builder.loadModel(filepath);
+		//builder.loadModel(filepath);
+		builder.load_glTF_Model(filepath);
 		std::cout << "unique vertices count of " << filepath << " is " << builder.vertices.size() << std::endl;
 		return std::make_unique<AppModel>(device, builder);
 	}

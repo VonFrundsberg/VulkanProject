@@ -15,6 +15,7 @@ namespace appNamespace {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
 			void loadModel(const std::string& filepath);
+			void load_glTF_Model(const std::string& filepath);
 		};
 
 		AppModel(AppDevice& device, const AppModel::Builder &builder);
