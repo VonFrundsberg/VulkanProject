@@ -141,32 +141,34 @@ namespace appNamespace {
 		indices.clear();
 
 		auto gltfObject = GLTF_Loader(filepath);
-		std::vector<float> modelPositions;
-		gltfObject.getData(modelPositions, "Cube", "POSITION");
+		for (const auto& mesh : gltfObject.meshes) {
+			std::vector<float> modelPositions;
+			gltfObject.getData(modelPositions, mesh.first, "POSITION");
 
-		std::vector<float> modelNormals;
-		gltfObject.getData(modelNormals, "Cube", "NORMAL");
+			std::vector<float> modelNormals;
+			gltfObject.getData(modelNormals, mesh.first, "NORMAL");
 
-		std::vector<float> modelUV;
-		gltfObject.getData(modelUV, "Cube", "TEXCOORD_0");
+			std::vector<float> modelUV;
+			gltfObject.getData(modelUV, mesh.first, "TEXCOORD_0");
 
-		std::vector<unsigned short> modelIndices;
-		gltfObject.getData(modelIndices, "Cube", "indices");
-		indices.resize(modelIndices.size());
+			std::vector<unsigned short> modelIndices;
+			gltfObject.getData(modelIndices, mesh.first, "indices");
+			indices.reserve(modelIndices.size());
 
-		for (const auto& obj : modelIndices) {
-			indices.push_back(static_cast<uint32_t>(obj));
-		}
-
-		for (int i = 0; i < 24; i++) {
-			Vertex vertex{};
-			vertex.position = {modelPositions[3 * i + 0],
-								modelPositions[3 * i + 1],
-								modelPositions[3 * i + 2]};
-			vertex.normal = { modelNormals[3 * i + 0], modelNormals[3 * i + 1], modelNormals[3 * i + 2] };
-			vertex.uv = { modelUV[2 * i + 0], modelUV[2 * i + 1] };
-			vertex.color = { 1.0f, 1.0f, 1.0f };
-			vertices.push_back(vertex);
+			for (const auto& obj : modelIndices) {
+				indices.push_back(static_cast<uint32_t>(obj));
+			}
+			const auto verticesAmount = static_cast<int>(modelPositions.size() / 3);
+			for (int i = 0; i < verticesAmount; i++) {
+				Vertex vertex{};
+				vertex.position = { modelPositions[3 * i + 0],
+									modelPositions[3 * i + 1],
+									modelPositions[3 * i + 2] };
+				vertex.normal = { modelNormals[3 * i + 0], modelNormals[3 * i + 1], modelNormals[3 * i + 2] };
+				vertex.uv = { modelUV[2 * i + 0], modelUV[2 * i + 1] };
+				vertex.color = { 1.0f, 1.0f, 1.0f };
+				vertices.push_back(vertex);
+			}
 		}
 	}
 	std::unique_ptr<AppModel> AppModel::createModelFromFile(AppDevice& device, const std::string& filepath)

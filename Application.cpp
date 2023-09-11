@@ -146,7 +146,7 @@ namespace appNamespace {
     void Application::loadObjects() {
         
         int n = 1;
-        std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./glTF/cube.gltf");
+        std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./glTF/complex/tommy.gltf");
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 1; i++) {
                 auto player = AppObject::createAppObject();
@@ -162,7 +162,7 @@ namespace appNamespace {
         }
         n = 1;
         int d = 20;
-        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./glTF/cube.gltf");
+        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./glTF/complex/house.gltf");
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto house = AppObject::createAppObject();
