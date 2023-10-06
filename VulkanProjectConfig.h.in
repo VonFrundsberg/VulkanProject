@@ -1,0 +1,2 @@
+#define VulkanProject_VERSION_MAJOR @VulkanProject_VERSION_MAJOR@
+#define VulkanProject_VERSION_MINOR @VulkanProject_VERSION_MINOR@
