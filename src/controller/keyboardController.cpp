@@ -16,7 +16,7 @@ namespace appNamespace {
 
 		//object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 		//object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
-
+		object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 		float yaw = object.transform.rotation.y;
 		const glm::vec3 forwardDir(sin(yaw), 0.0f, cos(yaw));
 		const glm::vec3 rightDir(forwardDir.z, 0.0f, -forwardDir.x);

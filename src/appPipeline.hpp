@@ -8,7 +8,7 @@ namespace appNamespace {
 	struct PipelineConfigInfo {
 		PipelineConfigInfo(const PipelineConfigInfo&) = delete;
 		PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
-
+		PipelineConfigInfo() {};
 
 		VkPipelineViewportStateCreateInfo viewportInfo;
 		VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;

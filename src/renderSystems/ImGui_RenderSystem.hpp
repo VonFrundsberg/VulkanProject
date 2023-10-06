@@ -1,7 +1,8 @@
 #pragma once
-#include "../../ImGui/imgui.h"
-#include "../../ImGui/imgui_impl_glfw.h"
-#include "../../ImGui/imgui_impl_vulkan.h"
+
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_glfw.h"
+#include "ImGui/imgui_impl_vulkan.h"
 #include "../appPipeline.hpp"
 #include "../appDevice.hpp"
 #include "../appObject.hpp"

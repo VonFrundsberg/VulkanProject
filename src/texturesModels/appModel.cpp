@@ -1,8 +1,8 @@
 #include "../appUtils.hpp"
 #include "appModel.hpp"
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <tiny_obj_loader.h>
-#include <glTF_Loader.hpp>
+#include "tiny_obj_loader.h"
+#include "glTF_Loader.hpp"
 #include <cassert>
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL

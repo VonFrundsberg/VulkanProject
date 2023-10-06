@@ -27,6 +27,8 @@ namespace appNamespace {
 		configInfo.inputAssemblyInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 		configInfo.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
+		configInfo.inputAssemblyInfo.pNext = nullptr;
+		configInfo.inputAssemblyInfo.flags = 0;
 
 		configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 		configInfo.viewportInfo.viewportCount = 1;
@@ -80,6 +82,7 @@ namespace appNamespace {
 		configInfo.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 		configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
 		configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
+		configInfo.dynamicStateInfo.pNext = nullptr;
 		configInfo.dynamicStateInfo.flags = 0;
 	}
 
@@ -166,7 +169,8 @@ namespace appNamespace {
 		
 		pipelineInfo.basePipelineIndex = -1;
 		pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-		if (vkCreateGraphicsPipelines(appDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+		if (vkCreateGraphicsPipelines(appDevice.device(), VK_NULL_HANDLE, 1,
+			&pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 			throw std::runtime_error("graphics pipeline failed to be created!");
 		}
 

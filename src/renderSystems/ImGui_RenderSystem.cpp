@@ -153,8 +153,8 @@ namespace appNamespace {
 			object.transform.translation = { 0 ,0, 0};
 			object.model = appObjects.at(item_current_idx).model;
 			object.texture = appObjects.at(item_current_idx).texture;
-			object.transform.rotation = { 3.14, 0.0, 0.0f };
-			object.transform.scale = { 2.0f, 2.0f, 2.0f };
+			object.transform.rotation = { 0.0f, 0.0f, 0.0f };
+			object.transform.scale = { 1.0f, 1.0f, 1.0f };
 			appObjects.emplace(object.getId(), std::move(object));
 			clicked = 0;
 		}
