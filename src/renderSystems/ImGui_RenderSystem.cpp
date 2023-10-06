@@ -18,7 +18,7 @@ namespace appNamespace {
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-		io.Fonts->AddFontFromFileTTF("ImGui/Fonts/Cousine-Regular.ttf", 18);
+		io.Fonts->AddFontFromFileTTF("Fonts/Cousine-Regular.ttf", 18);
 
 		ImGui_ImplGlfw_InitForVulkan(window.getGLFWwindow(), true);
 		ImGui_ImplVulkan_InitInfo init_info = {};

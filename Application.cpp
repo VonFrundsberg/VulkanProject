@@ -17,9 +17,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-#include "ImGui/imgui.h"
-#include "ImGui/imgui_impl_glfw.h"
-#include "ImGui/imgui_impl_vulkan.h"
+//#include "ImGui/imgui.h"
+//#include "ImGui/imgui_impl_glfw.h"
+//#include "ImGui/imgui_impl_vulkan.h"
 
 namespace appNamespace {
     struct GlobalUBO {
@@ -48,7 +48,6 @@ namespace appNamespace {
 
 
         this->initDescriptorSets(unorderedMapOfglobalDescriptorSets, globalSetLayout, uboBuffers);
-        
 
 		SimpleRenderSystem simpleRenderSystem{ appDevice, appRenderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout() };
@@ -57,7 +56,7 @@ namespace appNamespace {
             globalPools.at("ImGui")->getDescriptorPool()};
 
         AppCamera camera{};
-        glm::vec3 cameraDistanceToPlayer = { 0.0f, -2.0f, -1.5f };
+        glm::vec3 cameraDistanceToPlayer = {0.0f, -1.0f, -1.0f };
         //glm::vec3 cameraRotation = { -3.14f, -3.14f, 0.0f };
         glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
@@ -84,7 +83,9 @@ namespace appNamespace {
                 cameraDistanceToPlayer, (viewerObject).transform.translation,
                 (viewerObject).transform.rotation);
             appObjects[0].transform.translation = viewerObject.transform.translation;
-            appObjects[0].transform.rotation.y = 3.14 + viewerObject.transform.rotation.y;
+            //appObjects[0].transform.rotation.z = viewerObject.transform.rotation.z;
+            appObjects[0].transform.rotation.x = viewerObject.transform.rotation.x;
+            appObjects[0].transform.rotation.y = viewerObject.transform.rotation.y;
             //appObjects[0].transform.normalMatrix
             float aspect = appRenderer.getAspectRatio();
             //appObjects[rand() % appObjects.size()].isTarget = 2;
@@ -148,12 +149,12 @@ namespace appNamespace {
         int n = 1;
         std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./glTF/complex/tommy.gltf");
         for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < 2; i++) {
                 auto player = AppObject::createAppObject();
                 player.model = appModel1;
                 player.texture = this->_loadedTextures["tommy"];
                 player.transform.translation = { 0, 0.0, 0.0 };
-                player.transform.rotation = { 3.14, 3.14f , 0.0};
+                player.transform.rotation = { 0.0, 0.0f , 0.0};
                 //house.transform.rotation = { 3.14, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 player.transform.scale = { 0.5f, 0.5f, 0.5f };
@@ -169,9 +170,10 @@ namespace appNamespace {
                 house.model = appModel;
                 house.texture = this->_loadedTextures["house"];
                 //-45
-                house.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};
+                /*house.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};*/
+                house.transform.translation = { 0 , 0, 0};
                 //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-                house.transform.rotation = { 3.14, 0.0, 0.0f };
+                house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 house.transform.scale = { 2.0f, 2.0f, 2.0f };
                 appObjects.emplace(house.getId(), std::move(house));

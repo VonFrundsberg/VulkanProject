@@ -143,16 +143,16 @@ namespace appNamespace {
 		auto gltfObject = GLTF_Loader(filepath);
 		for (const auto& mesh : gltfObject.meshes) {
 			std::vector<float> modelPositions;
-			gltfObject.getData(modelPositions, mesh.first, "POSITION");
+			gltfObject.getMeshData(modelPositions, mesh.first, "POSITION");
 
 			std::vector<float> modelNormals;
-			gltfObject.getData(modelNormals, mesh.first, "NORMAL");
+			gltfObject.getMeshData(modelNormals, mesh.first, "NORMAL");
 
 			std::vector<float> modelUV;
-			gltfObject.getData(modelUV, mesh.first, "TEXCOORD_0");
+			gltfObject.getMeshData(modelUV, mesh.first, "TEXCOORD_0");
 
 			std::vector<unsigned short> modelIndices;
-			gltfObject.getData(modelIndices, mesh.first, "indices");
+			gltfObject.getMeshData(modelIndices, mesh.first, "indices");
 			indices.reserve(modelIndices.size());
 
 			for (const auto& obj : modelIndices) {
