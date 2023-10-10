@@ -147,7 +147,7 @@ namespace appNamespace {
     void Application::loadObjects() {
         
         int n = 1;
-        std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./glTF/complex/tommy.gltf");
+        std::shared_ptr<AppModel> appModel1 = AppModel::createModelFromFile(appDevice, "./glTF/tommy.gltf");
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 2; i++) {
                 auto player = AppObject::createAppObject();
@@ -163,7 +163,7 @@ namespace appNamespace {
         }
         n = 1;
         int d = 20;
-        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./glTF/complex/house.gltf");
+        std::shared_ptr<AppModel> appModel = AppModel::createModelFromFile(appDevice, "./glTF/grass.gltf");
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto house = AppObject::createAppObject();
@@ -199,13 +199,15 @@ namespace appNamespace {
     void Application::loadTextures()
     {
         this->_loadedTextures["tommy"] = 
-            AppTexture::createTextureFromFile(appDevice, "./textures/tommy.png", "tommy");
-        this->_loadedTextures["mountain"] = 
+            AppTexture::createTextureFromFile(appDevice, "./glTF/tommy.png", "tommy");
+        /*this->_loadedTextures["mountain"] = 
             AppTexture::createTextureFromFile(appDevice, "./textures/ground_grass.jpg");
         this->_loadedTextures["tree"] = 
             AppTexture::createTextureFromFile(appDevice, "./textures/tree1.jpg");
         this->_loadedTextures["house"] = 
-            AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png", "house");
+            AppTexture::createTextureFromFile(appDevice, "./textures/houseTextures/House_Albedo.png", "house");*/
+        this->_loadedTextures["house"] =
+            AppTexture::createTextureFromFile(appDevice, "./glTF/image.jpg", "house");
     }
 
     void Application::initDescriptorSets(
