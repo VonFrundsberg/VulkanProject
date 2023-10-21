@@ -279,7 +279,7 @@ namespace appNamespace {
 		}
 		
 		//Required extension on macOS
-		auto isMacOSSurface = std::find(std::begin(extensions), std::end(extensions), "VK_MVK_macos_surface");
+		auto isMacOSSurface = std::find(std::begin(extensions), std::end(extensions), "VK_EXT_metal_surface");
 
 		if (isMacOSSurface != std::end(extensions)){
 			extensions.push_back("VK_KHR_portability_enumeration");
