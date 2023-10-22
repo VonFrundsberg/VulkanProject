@@ -80,19 +80,19 @@ namespace appNamespace{
        /* const glm::vec3 u{ (cy), sx*sy, cx*sy };
         const glm::vec3 v{0, cx, -sx };
         const glm::vec3 w{ -sy, cy * sx, cx * cy };*/
-        std::cout << rotation.x << ", " << rotation.y;
-        std::cout << "\n";
+        /*std::cout << rotation.x << ", " << rotation.y;
+        std::cout << "\n";*/
         const glm::vec3 rotatedRelativePosition = {
-            (relativePosition.x * cy + (relativePosition.z * cx + relativePosition.y * sx) * sy),
-            (relativePosition.y * cx - relativePosition.z * sx),
-            (relativePosition.z * cx * cy + relativePosition.y * cy * sx - relativePosition.x * sy)
+           relativePosition.x * cy + (relativePosition.z * cx + relativePosition.y * sx) * sy,
+           relativePosition.y * cx - relativePosition.z * sx,
+           relativePosition.z * cx * cy + relativePosition.y * cy * sx - relativePosition.x * sy
         };
         /*const glm::vec3 rotatedRelativePosition = {
             (relativePosition.x * cx * cy - relativePosition.y * cy * sx + relativePosition.z * sy),
             (relativePosition.y * cx + relativePosition.x * sx),
             (relativePosition.z * cy + (relativePosition.y * sx - relativePosition.x * cx) * sy)
         };*/
-       /* const glm::vec3 rotatedRelativePosition = {
+        /*const glm::vec3 rotatedRelativePosition = {
             (relativePosition.y * cy + (relativePosition.z * cx + relativePosition.x * sx) * sy),
             (relativePosition.x * cx - relativePosition.z * sx),
             (relativePosition.z * cx * cy + relativePosition.x * cy * sx - relativePosition.y * sy)
@@ -102,8 +102,9 @@ namespace appNamespace{
             (relativePosition.y * cx + sx*(-relativePosition.z * cy + relativePosition.x * sy)),
             (relativePosition.y * sx + cx * (relativePosition.z * cy - relativePosition.x * sy))
         };*/
-        helperCout(rotatedRelativePosition, "rotated relative position: ");
-        const glm::vec3 direction = -glm::vec3{ 0.0f, glm::sign(rotatedRelativePosition.z), 0.0f};
+        //helperCout(rotatedRelativePosition, "rotated relative position: ");
+        /*const glm::vec3 direction = glm::vec3{ 0.0f, glm::sign(rotatedRelativePosition.z), 0.0f};*/
+        const glm::vec3 direction = glm::vec3{ 0.0f, -1.0f, 0.0f };
         setViewTarget(rotatedRelativePosition + person, person, direction);
     }
     

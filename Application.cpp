@@ -17,10 +17,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
-//#include "ImGui/imgui.h"
-//#include "ImGui/imgui_impl_glfw.h"
-//#include "ImGui/imgui_impl_vulkan.h"
-
 namespace appNamespace {
     struct GlobalUBO {
         alignas(16) glm::mat4 projectionView{ 1.0f };
@@ -58,9 +54,9 @@ namespace appNamespace {
         AppCamera camera{};
         glm::vec3 cameraDistanceToPlayer = {0.0f, -1.0f, -1.0f };
         //glm::vec3 cameraRotation = { -3.14f, -3.14f, 0.0f };
-        glm::vec3 cameraRotation = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 initCameraTranslation = { 0.0f, -0.5f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
-        //viewerObject.transform.translation = { 0.0f, -50.0f, 0.0f };
+        viewerObject.transform.translation = initCameraTranslation;
 
         KeyboardController keyboardCameraController{};
         MouseController mouseCameraController{appWindow.getGLFWwindow(), false};
@@ -84,7 +80,7 @@ namespace appNamespace {
                 (viewerObject).transform.rotation);
             appObjects[0].transform.translation = viewerObject.transform.translation;
             //appObjects[0].transform.rotation.z = viewerObject.transform.rotation.z;
-            appObjects[0].transform.rotation.x = viewerObject.transform.rotation.x;
+            //appObjects[0].transform.rotation.x = viewerObject.transform.rotation.x - 3.14/2.0;
             appObjects[0].transform.rotation.y = viewerObject.transform.rotation.y;
             //appObjects[0].transform.normalMatrix
             float aspect = appRenderer.getAspectRatio();
@@ -153,9 +149,9 @@ namespace appNamespace {
                 auto player = AppObject::createAppObject();
                 player.model = appModel1;
                 player.texture = this->_loadedTextures["tommy"];
-                player.transform.translation = { 0, 0.0, 0.0 };
-                player.transform.rotation = { 0.0, 0.0f , 0.0};
-                //house.transform.rotation = { 3.14, 0.0, 0.0f };
+                player.transform.translation = { 0, -0.5, 1.0 };
+                //player.transform.rotation = { 0.0, 0.0f , 0.0};
+                player.transform.rotation = { -3.14/2.0, 0.0f , 3.14f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 player.transform.scale = { 0.5f, 0.5f, 0.5f };
                 appObjects.emplace(player.getId(), std::move(player));
@@ -171,9 +167,9 @@ namespace appNamespace {
                 house.texture = this->_loadedTextures["house"];
                 //-45
                 /*house.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};*/
-                house.transform.translation = { 0 , 0, 0};
-                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-                house.transform.rotation = { 0.0, 0.0, 0.0f };
+                house.transform.translation = { 0, 0, 0};
+                house.transform.rotation = { 3.14, 0.0f , 0.0 };
+                //house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 house.transform.scale = { 2.0f, 2.0f, 2.0f };
                 appObjects.emplace(house.getId(), std::move(house));

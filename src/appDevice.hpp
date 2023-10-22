@@ -111,7 +111,5 @@ namespace appNamespace {
 			"VK_KHR_portability_subset"
 		#endif
 		};
-		//const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_portability_subset"};
-		//const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 	};
 };

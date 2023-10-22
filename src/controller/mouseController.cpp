@@ -20,7 +20,7 @@ namespace appNamespace {
 			}
 
 			//object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
-			object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -0.1f, 0.1f);
+			object.transform.rotation.x = glm::clamp(object.transform.rotation.x, -1.5f, 1.5f);
 			object.transform.rotation.y = glm::mod(object.transform.rotation.y, glm::two_pi<float>());
 		}
 		else {
