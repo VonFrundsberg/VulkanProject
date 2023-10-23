@@ -2,8 +2,6 @@ Using Vulkan API and
 
 Dear ImGUI: https://github.com/ocornut/imgui
 
-tinyobjloader: https://github.com/tinyobjloader/tinyobjloader
-
 stb image loader: https://github.com/nothings/stb
 
 glm library: https://github.com/g-truc/glm

@@ -1,3 +1,4 @@
+#include "appModel.hpp"
 #include "../appUtils.hpp"
 #include "appModel.hpp"
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -23,6 +24,7 @@ namespace appNamespace {
 	AppModel::AppModel(AppDevice& device, const AppModel::Builder& builder) : appDevice(device) {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
+		createJointMatrices(builder.invMatrices);
 	}
 	AppModel::~AppModel() {	
 	}
@@ -85,6 +87,11 @@ namespace appNamespace {
 		appDevice.copyBuffer(stagingBuffer.getBuffer(), indexBuffer->getBuffer(), bufferSize);
 	}
 
+	void AppModel::createJointMatrices(const std::vector<glm::mat4> invMatricesArg)
+	{
+		this->invMatrices = invMatricesArg;
+	}
+
 	void AppModel::Builder::loadModel(const std::string& filepath)
 	{
 		tinyobj::attrib_t attrib;
@@ -141,6 +148,11 @@ namespace appNamespace {
 		indices.clear();
 
 		auto gltfObject = GLTF_Loader(filepath);
+		if (!gltfObject.skins.empty()) {
+			for (const auto& skin : gltfObject.skins) {
+				 gltfObject.getInverseSkinMatrices(this->invMatrices, skin.first);
+			}
+		}
 		for (const auto& mesh : gltfObject.meshes) {
 			std::vector<float> modelPositions;
 			gltfObject.getMeshData(modelPositions, mesh.first, "POSITION");
@@ -150,6 +162,13 @@ namespace appNamespace {
 
 			std::vector<float> modelUV;
 			gltfObject.getMeshData(modelUV, mesh.first, "TEXCOORD_0");
+			std::vector<unsigned char> modelJoints;
+			std::vector<float> modelWeights;
+			if (!gltfObject.skins.empty()) {
+				gltfObject.getMeshData(modelJoints, mesh.first, "JOINTS_0");				
+				gltfObject.getMeshData(modelWeights, mesh.first, "WEIGHTS_0");
+				gltfObject.printMeshData(mesh.first, "JOINTS_0");
+			}
 
 			std::vector<unsigned short> modelIndices;
 			gltfObject.getMeshData(modelIndices, mesh.first, "indices");
@@ -164,11 +183,31 @@ namespace appNamespace {
 				vertex.position = { modelPositions[3 * i + 0],
 									modelPositions[3 * i + 1],
 									modelPositions[3 * i + 2] };
-				vertex.normal = { modelNormals[3 * i + 0], modelNormals[3 * i + 1], modelNormals[3 * i + 2] };
+
+				vertex.normal = {
+					modelNormals[3 * i + 0],
+					modelNormals[3 * i + 1],
+					modelNormals[3 * i + 2] };
+
 				vertex.uv = { modelUV[2 * i + 0], modelUV[2 * i + 1] };
+
 				vertex.color = { 1.0f, 1.0f, 1.0f };
+
+				if (!modelJoints.empty()) {
+					vertex.joints = { static_cast<float>(modelJoints[3 * i + 0]),
+						static_cast<float>(modelJoints[3 * i + 1]),
+						static_cast<float>(modelJoints[3 * i + 2]),
+						static_cast<float>(modelJoints[3 * i + 3]) };
+					vertex.weights = { modelWeights[3 * i + 0],
+						modelWeights[3 * i + 1],
+						modelWeights[3 * i + 2],
+						modelWeights[3 * i + 3]};
+					vertex.weights = { 1.0, 0.0, 0.0, 0.0};
+				}
 				vertices.push_back(vertex);
 			}
+
+			
 		}
 	}
 	std::unique_ptr<AppModel> AppModel::createModelFromFile(AppDevice& device, const std::string& filepath)
