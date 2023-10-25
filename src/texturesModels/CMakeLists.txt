@@ -8,7 +8,7 @@ include(FetchContent)
 FetchContent_Declare(
   glTF_VulkanLoader
   GIT_REPOSITORY https://github.com/VonFrundsberg/glTF_VulkanLoader.git
-  GIT_TAG        a33e92b72c9e64eda0f550a504d43751afffa998
+  GIT_TAG        00e2edd4245b34d98bec8517940fb98e521e1f12
 )
 FetchContent_MakeAvailable(glTF_VulkanLoader)
 

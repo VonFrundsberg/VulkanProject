@@ -25,12 +25,19 @@ const float AMBIENT = 0.1;
 
 void main()
 {
-	mat4 skinMatrix =
-        inWeights.x * ubo.u_jointMat[int(inJoints.x)] +
-        inWeights.y * ubo.u_jointMat[int(inJoints.y)] +
-        inWeights.z * ubo.u_jointMat[int(inJoints.z)] +
-        inWeights.w * ubo.u_jointMat[int(inJoints.w)];
-	gl_Position = ubo.projectionViewMatrix * push.modelMatrix * skinMatrix * vec4(inPosition, 1.0);
+	
+	if (dot(inWeights, inWeights) <= 0.001){
+		gl_Position = ubo.projectionViewMatrix * push.modelMatrix * vec4(inPosition, 1.0);
+	}
+	else{
+		mat4 skinMatrix =
+				inWeights.x * ubo.u_jointMat[int(inJoints.x)] +
+				inWeights.y * ubo.u_jointMat[int(inJoints.y)] +
+				inWeights.z * ubo.u_jointMat[int(inJoints.z)] +
+				inWeights.w * ubo.u_jointMat[int(inJoints.w)];
+		gl_Position = ubo.projectionViewMatrix * push.modelMatrix * skinMatrix * vec4(inPosition, 1.0);
+	}
+	
 	vec3 normalWorldSpace = normalize(mat3(push.normalMatrix) * inNormal);
 	float lightIntensity = AMBIENT + max(dot(normalWorldSpace, ubo.directionToLight), 0);
 	fragColor = lightIntensity * inColor;

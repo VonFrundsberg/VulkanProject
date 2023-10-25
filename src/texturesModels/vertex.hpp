@@ -10,8 +10,8 @@ namespace appNamespace {
 		glm::vec3 color{};
 		glm::vec3 normal{};
 		glm::vec2 uv{};
-		glm::vec4 joints{};
-		glm::vec4 weights{};
+		glm::vec4 joints{0.0f, 0.0f, 0.0f, 0.0f};
+		glm::vec4 weights{0.0f, 0.0f, 0.0f, 0.0f};
 
 		static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
 		static std::vector<VkVertexInputAttributeDescription> getAtrributeDescriptions();

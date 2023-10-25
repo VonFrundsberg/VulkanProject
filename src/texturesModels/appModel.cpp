@@ -6,8 +6,11 @@
 #include "glTF_Loader.hpp"
 #include <cassert>
 #include <iostream>
+#include <gtc/quaternion.hpp>
+#include <gtx/quaternion.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
+#include <gtx/string_cast.hpp>
 
 namespace std {
 	template<>
@@ -150,7 +153,49 @@ namespace appNamespace {
 		auto gltfObject = GLTF_Loader(filepath);
 		if (!gltfObject.skins.empty()) {
 			for (const auto& skin : gltfObject.skins) {
-				 gltfObject.getInverseSkinMatrices(this->invMatrices, skin.first);
+				 std::vector<glm::mat4> invMatricesTmp;
+				 std::vector<glm::mat4> globalTransformMatrices;
+				 gltfObject.getInverseSkinMatrices(invMatricesTmp, skin.first);
+				 
+				 std::vector<int> jointsVector;
+				 gltfObject.getJointsVector(jointsVector, skin.first);
+
+				 this->invMatrices.resize(jointsVector.size());
+				 globalTransformMatrices.resize(jointsVector.size());
+				 for (const int& nodeNumber : jointsVector) {
+					 const auto & translation = gltfObject.nodes[nodeNumber].translation;
+					 std::vector<float> scale = gltfObject.nodes[nodeNumber].scale;
+					 if (scale[0]*scale[0] + scale[1]*scale[1] + scale[2]*scale[2] <= 0.01) {
+						 scale[0] = 1.0;  scale[1] = 1.0; scale[2] = 1.0;
+					 }
+					 const auto& rotation = gltfObject.nodes[nodeNumber].rotation;
+					 const auto& identityMatrix = glm::mat4{ 1.0f };
+					 //std::cout << glm::to_string(identityMatrix);
+					// std::cout << "number " << nodeNumber << '\n';
+					 glm::mat4 translateMatrix = glm::translate(identityMatrix,
+						 glm::vec3{ translation[0], translation[1], translation[2]});
+					 //std::cout << glm::to_string(translateMatrix) << "\n";
+					 glm::mat4 scaleMatrix = glm::scale(identityMatrix, 
+						 glm::vec3{ scale[0], scale[1], scale[2]});
+					 //std::cout << glm::to_string(scaleMatrix) << "\n";
+
+					 glm::quat rotationQuat{rotation[3], rotation[0], rotation[1], rotation[2]};
+					 glm::mat4 rotationMatrix = glm::toMat4(rotationQuat);
+					 glm::mat4 transformMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+					 globalTransformMatrices[nodeNumber] = transformMatrix;
+				 }
+				 for (const int& nodeNumber : jointsVector) {
+					 const auto& children = gltfObject.nodes[nodeNumber].children;
+					 for (const int& childNumber : children) {
+						 globalTransformMatrices[childNumber] =
+							 globalTransformMatrices[nodeNumber] * globalTransformMatrices[childNumber];
+					 }
+				 }
+				 int i = 0;
+				 for (const int& nodeNumber : jointsVector) {
+					 this->invMatrices[i] = globalTransformMatrices[nodeNumber] * invMatricesTmp[i];
+					 i++;
+				 }
 			}
 		}
 		for (const auto& mesh : gltfObject.meshes) {
@@ -167,7 +212,7 @@ namespace appNamespace {
 			if (!gltfObject.skins.empty()) {
 				gltfObject.getMeshData(modelJoints, mesh.first, "JOINTS_0");				
 				gltfObject.getMeshData(modelWeights, mesh.first, "WEIGHTS_0");
-				gltfObject.printMeshData(mesh.first, "JOINTS_0");
+				//gltfObject.printMeshData(mesh.first, "JOINTS_0");
 			}
 
 			std::vector<unsigned short> modelIndices;
@@ -194,15 +239,15 @@ namespace appNamespace {
 				vertex.color = { 1.0f, 1.0f, 1.0f };
 
 				if (!modelJoints.empty()) {
-					vertex.joints = { static_cast<float>(modelJoints[3 * i + 0]),
-						static_cast<float>(modelJoints[3 * i + 1]),
-						static_cast<float>(modelJoints[3 * i + 2]),
-						static_cast<float>(modelJoints[3 * i + 3]) };
-					vertex.weights = { modelWeights[3 * i + 0],
-						modelWeights[3 * i + 1],
-						modelWeights[3 * i + 2],
-						modelWeights[3 * i + 3]};
-					vertex.weights = { 1.0, 0.0, 0.0, 0.0};
+					vertex.joints = { static_cast<float>(modelJoints[4 * i + 0]),
+						static_cast<float>(modelJoints[4 * i + 1]),
+						static_cast<float>(modelJoints[4 * i + 2]),
+						static_cast<float>(modelJoints[4 * i + 3]) };
+					vertex.weights = { modelWeights[4 * i + 0],
+						modelWeights[4 * i + 1],
+						modelWeights[4 * i + 2],
+						modelWeights[4 * i + 3]};
+					//vertex.weights = { 1.0, 0.0, 0.0, 0.0};
 				}
 				vertices.push_back(vertex);
 			}

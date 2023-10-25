@@ -103,17 +103,37 @@ namespace appNamespace {
                 glm::mat4 identityMatrix = glm::mat4(1.0f);
                 for (const auto& obj : appObjects) {
                     if (!obj.second.model.get()->invMatrices.empty()) {
-                        ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[2];
+                       /* ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[2];
                         ubo.jointMatrices[1] = obj.second.model.get()->invMatrices[0];
-                        ubo.jointMatrices[2] = obj.second.model.get()->invMatrices[1];
-                        /*for (int i = 0; i < obj.second.model.get()->invMatrices.size(); i++) {
-                            ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[2];
+                        ubo.jointMatrices[2] = obj.second.model.get()->invMatrices[1];*/
+
+                        /*ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[5];
+                        ubo.jointMatrices[1] = obj.second.model.get()->invMatrices[0];
+                        ubo.jointMatrices[2] = obj.second.model.get()->invMatrices[2];
+
+                        ubo.jointMatrices[3] = obj.second.model.get()->invMatrices[1];
+                        ubo.jointMatrices[4] = obj.second.model.get()->invMatrices[4];
+                        ubo.jointMatrices[5] = obj.second.model.get()->invMatrices[3];
+
+                        ubo.jointMatrices[6] = obj.second.model.get()->invMatrices[9];
+                        ubo.jointMatrices[7] = obj.second.model.get()->invMatrices[8];
+                        ubo.jointMatrices[8] = obj.second.model.get()->invMatrices[7];
+
+                        ubo.jointMatrices[9] = obj.second.model.get()->invMatrices[6];
+                        ubo.jointMatrices[10] = obj.second.model.get()->invMatrices[13];
+                        ubo.jointMatrices[11] = obj.second.model.get()->invMatrices[12];
+
+                        ubo.jointMatrices[12] = obj.second.model.get()->invMatrices[11];
+                        ubo.jointMatrices[13] = obj.second.model.get()->invMatrices[10];*/
+                        for (int i = 0; i < obj.second.model.get()->invMatrices.size(); i++) {
+                            ubo.jointMatrices[i] = obj.second.model.get()->invMatrices[i];
+                        }
+                        /*for (int i = 0; i < ubo.jointMatrices->length(); i++) {
+                            ubo.jointMatrices[i] = identityMatrix;
                         }*/
                     }
                 }
-                /*for (int i = 0; i < ubo.jointMatrices->length(); i++) {
-                    ubo.jointMatrices[i] = identityMatrix;
-                }*/
+                
                 ubo.projectionView = camera.getProjection() * camera.getView();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
@@ -191,17 +211,19 @@ namespace appNamespace {
         //        appObjects.emplace(grass.getId(), std::move(grass));
         //    }
         //}
-        std::shared_ptr<AppModel> appModelCube = AppModel::createModelFromFile(appDevice, "./glTF/flexing_cube.gltf");
+        std::shared_ptr<AppModel> appModelCube =
+            AppModel::createModelFromFile(appDevice, "./glTF/complex/skeletal_tommy.gltf");
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
                 auto cube = AppObject::createAppObject();
                 cube.model = appModelCube;
-                cube.texture = this->_loadedTextures["grass"];
-                cube.transform.translation = { -n * 10 / 2 + 10 * i / 1.5 + 5, 5, -n * 10 / 2 + 10 * j / 1.5 + 5 };
-                //cube.transform.rotation = { 3.14 / 2, 0.0, 0.0f };
-                cube.transform.rotation = { 3.14, 0.0, 0.0f };
+                cube.texture = this->_loadedTextures["tommy"];
+                /*cube.transform.translation = { -n * 10 / 2 + 10 * i / 1.5 + 5, 5, -n * 10 / 2 + 10 * j / 1.5 + 5 };*/
+                cube.transform.translation = { 0, -0.5, 1.2 };
+                cube.transform.rotation = { 3.14, 3.14, 0.0f };
+                //cube.transform.rotation = { -3.14 / 2, 0.0f , 3.14f /2 };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
-                cube.transform.scale = { 2.0f, 2.0f, 2.0f };
+                cube.transform.scale = { 0.5f, 0.3f, 0.5f };
                 appObjects.emplace(cube.getId(), std::move(cube));
             }
         }   
