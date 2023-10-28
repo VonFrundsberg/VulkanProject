@@ -2,7 +2,7 @@
 
 #include "../appPipeline.hpp"
 #include "../appDevice.hpp"
-#include "../appObject.hpp"
+#include "../objects/appObject.hpp"
 #include "../appCamera.hpp"
 #include "../frameInfo.hpp"
 #include <memory>

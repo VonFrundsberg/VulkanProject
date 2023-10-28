@@ -14,7 +14,7 @@ namespace appNamespace {
 		struct Builder {
 			std::vector<Vertex> vertices{};
 			std::vector<uint32_t> indices{};
-			std::vector<glm::mat4> invMatrices;
+			std::vector<glm::mat4> jointMatrices;
 			void loadModel(const std::string& filepath);
 			void load_glTF_Model(const std::string& filepath);
 		};
@@ -29,7 +29,7 @@ namespace appNamespace {
 
 		void bind(VkCommandBuffer commandBuffer);
 		void draw(VkCommandBuffer commandBuffer);
-		std::vector<glm::mat4> invMatrices;
+		std::vector<glm::mat4> jointMatrices;
 	private:
 		void createVertexBuffers(const std::vector<Vertex>& vertices);
 		void createIndexBuffers(const std::vector<uint32_t>& indices);

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "texturesModels/appModel.hpp"
-#include "texturesModels/appTexture.hpp"
-//#include "frameInfo.hpp"
+#include "../texturesModels/appModel.hpp"
+#include "../texturesModels/appTexture.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
@@ -35,18 +34,15 @@ namespace appNamespace {
 
 		id_t getId(){ return id; }
 
-		std::shared_ptr<AppModel> model;
-		std::shared_ptr<AppTexture> texture;
-		//std::vector<VkDescriptorSet>* textureDescriptors;
+		std::shared_ptr<AppModel> model = nullptr;
+		std::shared_ptr<AppTexture> texture = nullptr;
 		glm::vec4 color{};
 		TransformComponent transform{};
-		bool isVisible(/*FrameInfo& frameInfo*/);
 		AppObject() {};
 		int isTarget = 0;
 	private:
 		AppObject(id_t objectId) : id{ objectId } {};
 		id_t id;
-		bool visible{ false };
 
 	};
 }

@@ -1,5 +1,5 @@
 #pragma once
-#include "../appObject.hpp"
+#include "../objects/appObject.hpp"
 #include "../appWindow.hpp"
 
 namespace appNamespace {

@@ -1,6 +1,7 @@
 add_subdirectory(controller)
 add_subdirectory(renderSystems)
 add_subdirectory(texturesModels)
+add_subdirectory(objects)
 
 add_library(SrcLibrary STATIC
     appWindow.cpp
@@ -11,7 +12,6 @@ add_library(SrcLibrary STATIC
     appCamera.cpp
     appPipeline.cpp
     appSwapChain.cpp
-    appObject.cpp
 )
 target_include_directories(SrcLibrary PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -25,6 +25,7 @@ target_link_libraries(SrcLibrary PUBLIC
     ControllerLibrary
     RenderLibrary
     TexModLibrary
+    ObjectLibrary
     )
 
    # message(CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")

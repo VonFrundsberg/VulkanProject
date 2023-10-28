@@ -54,7 +54,7 @@ namespace appNamespace {
             globalPools.at("ImGui")->getDescriptorPool()};
 
         AppCamera camera{};
-        glm::vec3 cameraDistanceToPlayer = {0.0f, -1.0f, -1.0f };
+        glm::vec3 cameraDistanceToPlayer = {0.0f, -2.0f, -2.0f };
         //glm::vec3 cameraRotation = { -3.14f, -3.14f, 0.0f };
         glm::vec3 initCameraTranslation = { 0.0f, -0.5f, 0.0f };
         auto viewerObject = AppObject::createAppObject();
@@ -70,9 +70,7 @@ namespace appNamespace {
             auto newTime = std::chrono::high_resolution_clock::now();
             float frameTimeFull = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
             currentTime = newTime;
-            //frameTimeFull = glm::min(frameTimeFull, MAX_FRAME_TIME);
-            //std::cout << 1.0 / abs(frameTimeFull) << std::endl;
-            //std::cout << "total time passed: " << abs(frameTimeFull) << std::endl;
+
             auto dt = glm::min(frameTimeFull, MAX_FRAME_TIME);
             keyboardCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
             mouseCameraController.moveInPlaneXZ(appWindow.getGLFWwindow(), dt, viewerObject);
@@ -84,10 +82,8 @@ namespace appNamespace {
             //appObjects[0].transform.rotation.z = viewerObject.transform.rotation.z;
             //appObjects[0].transform.rotation.x = viewerObject.transform.rotation.x - 3.14/2.0;
             appObjects[0].transform.rotation.y = viewerObject.transform.rotation.y;
-            //appObjects[0].transform.normalMatrix
             float aspect = appRenderer.getAspectRatio();
-            //appObjects[rand() % appObjects.size()].isTarget = 2;
-            camera.setPerspectiveProjection(glm::radians(50.0f), aspect, 0.1f, 1000.0f);
+            camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
                 int frameIndex = appRenderer.getFrameIndex();
@@ -101,36 +97,13 @@ namespace appNamespace {
                 //update 
                 GlobalUBO ubo{};
                 glm::mat4 identityMatrix = glm::mat4(1.0f);
+
+                //updateJointMatrices
                 for (const auto& obj : appObjects) {
-                    if (!obj.second.model.get()->invMatrices.empty()) {
-                       /* ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[2];
-                        ubo.jointMatrices[1] = obj.second.model.get()->invMatrices[0];
-                        ubo.jointMatrices[2] = obj.second.model.get()->invMatrices[1];*/
-
-                        /*ubo.jointMatrices[0] = obj.second.model.get()->invMatrices[5];
-                        ubo.jointMatrices[1] = obj.second.model.get()->invMatrices[0];
-                        ubo.jointMatrices[2] = obj.second.model.get()->invMatrices[2];
-
-                        ubo.jointMatrices[3] = obj.second.model.get()->invMatrices[1];
-                        ubo.jointMatrices[4] = obj.second.model.get()->invMatrices[4];
-                        ubo.jointMatrices[5] = obj.second.model.get()->invMatrices[3];
-
-                        ubo.jointMatrices[6] = obj.second.model.get()->invMatrices[9];
-                        ubo.jointMatrices[7] = obj.second.model.get()->invMatrices[8];
-                        ubo.jointMatrices[8] = obj.second.model.get()->invMatrices[7];
-
-                        ubo.jointMatrices[9] = obj.second.model.get()->invMatrices[6];
-                        ubo.jointMatrices[10] = obj.second.model.get()->invMatrices[13];
-                        ubo.jointMatrices[11] = obj.second.model.get()->invMatrices[12];
-
-                        ubo.jointMatrices[12] = obj.second.model.get()->invMatrices[11];
-                        ubo.jointMatrices[13] = obj.second.model.get()->invMatrices[10];*/
-                        for (int i = 0; i < obj.second.model.get()->invMatrices.size(); i++) {
-                            ubo.jointMatrices[i] = obj.second.model.get()->invMatrices[i];
+                    if (!obj.second.model.get()->jointMatrices.empty()) {
+                        for (int i = 0; i < obj.second.model.get()->jointMatrices.size(); i++) {
+                            ubo.jointMatrices[i] = obj.second.model.get()->jointMatrices[i];
                         }
-                        /*for (int i = 0; i < ubo.jointMatrices->length(); i++) {
-                            ubo.jointMatrices[i] = identityMatrix;
-                        }*/
                     }
                 }
                 
@@ -148,10 +121,8 @@ namespace appNamespace {
 				appRenderer.endFrame();
 			}
             auto renderingTime = std::chrono::duration<float, std::chrono::seconds::period>(std::chrono::high_resolution_clock::now() - newTime).count();
-            //std::cout << "sleep for microseconds: " << int(1000000 * (1.0 / this->FPS_CAP - renderingTime)) << std::endl;
             std::this_thread::sleep_for(std::chrono::microseconds(int( 1000000*(1.0/ this->FPS_CAP - renderingTime))));
-            //std::cout << "should be: " << 1.0 / this->FPS_CAP << ", but we have: " << renderingTime << std::endl;
-           // std::cout << "before sleep we have: " << renderingTime << std::endl;
+
 		}
 		vkDeviceWaitIdle(appDevice.device());
 	}
@@ -180,8 +151,8 @@ namespace appNamespace {
         
         int n = 1;
         std::shared_ptr<AppModel> appModelTommy = AppModel::createModelFromFile(appDevice, "./glTF/tommy.gltf");
-        for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < n; i++) {
                 auto player = AppObject::createAppObject();
                 player.model = appModelTommy;
                 player.texture = this->_loadedTextures["tommy"];
@@ -193,45 +164,47 @@ namespace appNamespace {
                 appObjects.emplace(player.getId(), std::move(player));
             }
         }
-        //n = 1;
-        //int d = 20;
-        //std::shared_ptr<AppModel> appModelGrass = AppModel::createModelFromFile(appDevice, "./glTF/grass.gltf");
-        //for (int j = 0; j < n; j++) {
-        //    for (int i = 0; i < n; i++) {
-        //        auto grass = AppObject::createAppObject();
-        //        grass.model = appModelGrass;
-        //        grass.texture = this->_loadedTextures["grass"];
-        //        //-45
-        //        /*house.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};*/
-        //        grass.transform.translation = { 0, 0, 0};
-        //        grass.transform.rotation = { 3.14, 0.0f , 0.0 };
-        //        //house.transform.rotation = { 0.0, 0.0, 0.0f };
-        //        //house.transform.scale = { 0.5f, 0.5f, 0.5f };
-        //        grass.transform.scale = { 2.0f, 2.0f, 2.0f };
-        //        appObjects.emplace(grass.getId(), std::move(grass));
-        //    }
-        //}
-        std::shared_ptr<AppModel> appModelCube =
-            AppModel::createModelFromFile(appDevice, "./glTF/complex/skeletal_tommy.gltf");
+        n = 1;
+        int d = 20;
+        std::shared_ptr<AppModel> appModelGrass = AppModel::createModelFromFile(appDevice, "./glTF/grass.gltf");
         for (int j = 0; j < n; j++) {
             for (int i = 0; i < n; i++) {
-                auto cube = AppObject::createAppObject();
-                cube.model = appModelCube;
-                cube.texture = this->_loadedTextures["tommy"];
-                /*cube.transform.translation = { -n * 10 / 2 + 10 * i / 1.5 + 5, 5, -n * 10 / 2 + 10 * j / 1.5 + 5 };*/
-                cube.transform.translation = { 0, -0.5, 1.2 };
-                cube.transform.rotation = { 3.14, 3.14, 0.0f };
-                //cube.transform.rotation = { -3.14 / 2, 0.0f , 3.14f /2 };
+                auto grass = AppObject::createAppObject();
+                grass.model = appModelGrass;
+                grass.texture = this->_loadedTextures["grass"];
+                //-45
+                //grass.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};
+                grass.transform.translation = { 0, 0, 0};
+                grass.transform.rotation = { 0.0, 0.0f, 0.0};
+                //house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
-                cube.transform.scale = { 0.5f, 0.3f, 0.5f };
-                appObjects.emplace(cube.getId(), std::move(cube));
+                grass.transform.scale = { 2.5f, 2.5f, 2.5f };
+                appObjects.emplace(grass.getId(), std::move(grass));
             }
-        }   
+        }
+        //std::shared_ptr<AppModel> appModelCube =
+        //    AppModel::createModelFromFile(appDevice, "./glTF/complex/skeletal_tommy.gltf");
+        //for (int j = 0; j < n; j++) {
+        //    for (int i = 0; i < n; i++) {
+        //        auto cube = AppObject::createAppObject();
+        //        cube.model = appModelCube;
+        //        cube.texture = this->_loadedTextures["tommy"];
+        //        /*cube.transform.translation = { -n * 10 / 2 + 10 * i / 1.5 + 5, 5, -n * 10 / 2 + 10 * j / 1.5 + 5 };*/
+        //        cube.transform.translation = { 0, -0.5, 1.2 };
+        //        cube.transform.rotation = { 3.14, 3.14, 0.0f };
+        //        //cube.transform.rotation = { -3.14 / 2, 0.0f , 3.14f /2 };
+        //        //house.transform.scale = { 0.5f, 0.5f, 0.5f };
+        //        cube.transform.scale = { 0.5f, 0.3f, 0.5f };
+        //        appObjects.emplace(cube.getId(), std::move(cube));
+        //    }
+        //}   
     }
     void Application::loadTextures()
     {
         this->_loadedTextures["tommy"] = 
             AppTexture::createTextureFromFile(appDevice, "./glTF/tommy.png", "tommy");
+        this->_loadedTextures["aggramar"] =
+            AppTexture::createTextureFromFile(appDevice, "./glTF/complex/aggramar.png", "aggramar");
         this->_loadedTextures["grass"] =
             AppTexture::createTextureFromFile(appDevice, "./glTF/image.jpg", "grass");
     }

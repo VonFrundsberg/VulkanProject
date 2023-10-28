@@ -150,7 +150,7 @@ namespace appNamespace {
 		{
 			auto object = AppObject::createAppObject();
 			//-45
-			object.transform.translation = { 0 ,0, 0};
+			object.transform.translation = {rand()%100, rand() % 100, rand() % 100 };
 			object.model = appObjects.at(item_current_idx).model;
 			object.texture = appObjects.at(item_current_idx).texture;
 			object.transform.rotation = { 0.0f, 0.0f, 0.0f };

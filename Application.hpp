@@ -2,7 +2,7 @@
 #include "src/appWindow.hpp"
 #include "src/appDevice.hpp"
 #include "src/appRenderer.hpp"
-#include "src/appObject.hpp"
+#include "src/objects/appObject.hpp"
 #include "src/texturesModels/appTexture.hpp"
 #include "src/descriptors.hpp"
 #include <memory>

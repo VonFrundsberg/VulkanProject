@@ -1,6 +1,6 @@
 #pragma once
 #include "appCamera.hpp"
-#include "appObject.hpp"
+#include "objects/appObject.hpp"
 
 #include <vulkan/vulkan.h>
 

@@ -58,22 +58,4 @@ namespace appNamespace {
                 invScale.z * (c1 * c2),
             } };
     }
-    bool AppObject::isVisible(/*FrameInfo& frameInfo*/)
-    {
-        return true;
-        /*if (!this->visible) {
-            std::cout << "id:" << this->getId() << "; "
-                << this->transform.translation.x << ", "
-                << this->transform.translation.y << ", "
-                << this->transform.translation.z << "\n";
-            this->visible = true;
-            return true;
-        }
-        else {
-            return true;
-        }*/
-
-        
-        //frameInfo.camera
-    }
 }

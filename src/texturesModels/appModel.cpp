@@ -27,7 +27,7 @@ namespace appNamespace {
 	AppModel::AppModel(AppDevice& device, const AppModel::Builder& builder) : appDevice(device) {
 		createVertexBuffers(builder.vertices);
 		createIndexBuffers(builder.indices);
-		createJointMatrices(builder.invMatrices);
+		createJointMatrices(builder.jointMatrices);
 	}
 	AppModel::~AppModel() {	
 	}
@@ -92,7 +92,7 @@ namespace appNamespace {
 
 	void AppModel::createJointMatrices(const std::vector<glm::mat4> invMatricesArg)
 	{
-		this->invMatrices = invMatricesArg;
+		this->jointMatrices = invMatricesArg;
 	}
 
 	void AppModel::Builder::loadModel(const std::string& filepath)
@@ -160,7 +160,7 @@ namespace appNamespace {
 				 std::vector<int> jointsVector;
 				 gltfObject.getJointsVector(jointsVector, skin.first);
 
-				 this->invMatrices.resize(jointsVector.size());
+				 this->jointMatrices.resize(jointsVector.size());
 				 globalTransformMatrices.resize(jointsVector.size());
 				 for (const int& nodeNumber : jointsVector) {
 					 const auto & translation = gltfObject.nodes[nodeNumber].translation;
@@ -168,15 +168,24 @@ namespace appNamespace {
 					 if (scale[0]*scale[0] + scale[1]*scale[1] + scale[2]*scale[2] <= 0.01) {
 						 scale[0] = 1.0;  scale[1] = 1.0; scale[2] = 1.0;
 					 }
-					 const auto& rotation = gltfObject.nodes[nodeNumber].rotation;
+					 
+
+					 auto& rotation = gltfObject.nodes[nodeNumber].rotation;
+					 
 					 const auto& identityMatrix = glm::mat4{ 1.0f };
 					 //std::cout << glm::to_string(identityMatrix);
 					// std::cout << "number " << nodeNumber << '\n';
 					 glm::mat4 translateMatrix = glm::translate(identityMatrix,
 						 glm::vec3{ translation[0], translation[1], translation[2]});
 					 //std::cout << glm::to_string(translateMatrix) << "\n";
+					 if (nodeNumber == 7) {
+						 scale[0] += 1.0f;
+						 scale[1] += 1.0f;
+						 scale[2] += 1.0f;
+					 }
 					 glm::mat4 scaleMatrix = glm::scale(identityMatrix, 
 						 glm::vec3{ scale[0], scale[1], scale[2]});
+					 
 					 //std::cout << glm::to_string(scaleMatrix) << "\n";
 
 					 glm::quat rotationQuat{rotation[3], rotation[0], rotation[1], rotation[2]};
@@ -193,7 +202,7 @@ namespace appNamespace {
 				 }
 				 int i = 0;
 				 for (const int& nodeNumber : jointsVector) {
-					 this->invMatrices[i] = globalTransformMatrices[nodeNumber] * invMatricesTmp[i];
+					 this->jointMatrices[i] = globalTransformMatrices[nodeNumber] * invMatricesTmp[i];
 					 i++;
 				 }
 			}

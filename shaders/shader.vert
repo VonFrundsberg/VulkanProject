@@ -25,7 +25,6 @@ const float AMBIENT = 0.1;
 
 void main()
 {
-	
 	if (dot(inWeights, inWeights) <= 0.001){
 		gl_Position = ubo.projectionViewMatrix * push.modelMatrix * vec4(inPosition, 1.0);
 	}
@@ -35,6 +34,7 @@ void main()
 				inWeights.y * ubo.u_jointMat[int(inJoints.y)] +
 				inWeights.z * ubo.u_jointMat[int(inJoints.z)] +
 				inWeights.w * ubo.u_jointMat[int(inJoints.w)];
+
 		gl_Position = ubo.projectionViewMatrix * push.modelMatrix * skinMatrix * vec4(inPosition, 1.0);
 	}
 	
