@@ -3,6 +3,8 @@
 #include "../texturesModels/appModel.hpp"
 #include "../texturesModels/appTexture.hpp"
 
+#include "intersectionComponent.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <memory>
 #include <unordered_map>
@@ -38,6 +40,7 @@ namespace appNamespace {
 		std::shared_ptr<AppTexture> texture = nullptr;
 		glm::vec4 color{};
 		TransformComponent transform{};
+		IntersectionComponent intersection{};
 		AppObject() {};
 		int isTarget = 0;
 	private:

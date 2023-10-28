@@ -161,9 +161,11 @@ namespace appNamespace {
                 player.transform.rotation = { -3.14/2.0, 0.0f , 3.14f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 player.transform.scale = { 0.5f, 0.5f, 0.5f };
+                player.intersection.setComponentData(IntersectionComponent::ELLIPSE, { 1.0f, 1.0f, 1.0f });
                 appObjects.emplace(player.getId(), std::move(player));
             }
         }
+
         n = 1;
         int d = 20;
         std::shared_ptr<AppModel> appModelGrass = AppModel::createModelFromFile(appDevice, "./glTF/grass.gltf");
@@ -178,7 +180,13 @@ namespace appNamespace {
                 grass.transform.rotation = { 0.0, 0.0f, 0.0};
                 //house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
-                grass.transform.scale = { 2.5f, 2.5f, 2.5f };
+                grass.transform.scale = { 3.0f, 1.0f, 1.0f };
+                grass.intersection.setComponentData(IntersectionComponent::PLANE, {
+                    -3.0f, 0.0f, -1.0f,   // Point A
+                    3.0f, 0.0f, -1.0f,   // Point B
+                    3.0f, 0.0f, 1.0f,   // Point C
+                    -3.0f, 0.0f, 1.0f }    // Point D}
+                    );
                 appObjects.emplace(grass.getId(), std::move(grass));
             }
         }
