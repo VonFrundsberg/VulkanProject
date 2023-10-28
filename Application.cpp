@@ -4,7 +4,7 @@
 #include "src/renderSystems/ImGui_RenderSystem.hpp"
 #include "src/controller/keyboardController.hpp"
 #include "src/controller/mouseController.hpp"
-
+#include "src/physicsSystems/physicsSystem.hpp"
 
 #include <iostream>
 #include <array>
@@ -62,9 +62,9 @@ namespace appNamespace {
 
         KeyboardController keyboardCameraController{};
         MouseController mouseCameraController{appWindow.getGLFWwindow(), false};
-
+        PhysicsSystem physicsSystem{};
         auto currentTime = std::chrono::high_resolution_clock::now();
-
+        
 		while (!appWindow.shouldClose()) {
 			glfwPollEvents(); 
             auto newTime = std::chrono::high_resolution_clock::now();
@@ -84,6 +84,9 @@ namespace appNamespace {
             appObjects[0].transform.rotation.y = viewerObject.transform.rotation.y;
             float aspect = appRenderer.getAspectRatio();
             camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
+
+            
+            physicsSystem.updateState(dt);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
                 int frameIndex = appRenderer.getFrameIndex();

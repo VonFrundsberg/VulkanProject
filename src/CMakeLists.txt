@@ -2,6 +2,7 @@ add_subdirectory(controller)
 add_subdirectory(renderSystems)
 add_subdirectory(texturesModels)
 add_subdirectory(objects)
+add_subdirectory(physicsSystems)
 
 add_library(SrcLibrary STATIC
     appWindow.cpp
@@ -26,6 +27,7 @@ target_link_libraries(SrcLibrary PUBLIC
     RenderLibrary
     TexModLibrary
     ObjectLibrary
+    PhysicsLibrary
     )
 
    # message(CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
