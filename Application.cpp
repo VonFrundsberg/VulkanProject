@@ -86,7 +86,7 @@ namespace appNamespace {
             camera.setPerspectiveProjection(glm::radians(45.0f), aspect, 0.1f, 1000.0f);
 
             
-            physicsSystem.updateState(dt);
+            physicsSystem.updateState(appObjects, dt);
 
 			if (auto commandBuffer = appRenderer.beginFrame()) {
                 int frameIndex = appRenderer.getFrameIndex();
@@ -184,12 +184,18 @@ namespace appNamespace {
                 //house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 grass.transform.scale = { 3.0f, 1.0f, 1.0f };
+                //grass.intersection.setComponentData(IntersectionComponent::PLANE, {
+                //    -3.0f, 0.0f, -1.0f,   // Point A
+                //    3.0f, 0.0f, -1.0f,   // Point B
+                //    3.0f, 0.0f, 1.0f,   // Point C
+                //    -3.0f, 0.0f, 1.0f }    // Point D}
+                //    );
                 grass.intersection.setComponentData(IntersectionComponent::PLANE, {
-                    -3.0f, 0.0f, -1.0f,   // Point A
-                    3.0f, 0.0f, -1.0f,   // Point B
-                    3.0f, 0.0f, 1.0f,   // Point C
+                    3.2f, 1.5f, 0.7f,   // Point A
+                    0.3f, 2.5f, 1.6f,   // Point B
+                    0.9f, 1.2f, 3.5f,   // Point C
                     -3.0f, 0.0f, 1.0f }    // Point D}
-                    );
+                );
                 appObjects.emplace(grass.getId(), std::move(grass));
             }
         }

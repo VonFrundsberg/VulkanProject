@@ -5,3 +5,8 @@ add_library(PhysicsLibrary
 target_include_directories(PhysicsLibrary PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     "${Vulkan_INCLUDE_DIR}/glm"
+)
+
+target_link_libraries(PhysicsLibrary PUBLIC
+    ObjectLibrary
+    )

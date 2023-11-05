@@ -1,8 +1,10 @@
 #pragma once
+#include "../objects/appObject.hpp"
 
 namespace appNamespace {
-	class intersectionSystem {
+	class IntersectionSystem {
 	public:
-		intersectionSystem();
+		IntersectionSystem();
+		int isIntersected(const AppObject &objectOf, const AppObject &objectWith);
 	};
 }
