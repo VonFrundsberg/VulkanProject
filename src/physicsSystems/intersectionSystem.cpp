@@ -25,11 +25,17 @@ int appNamespace::IntersectionSystem::isIntersected(const AppObject& objectOf, c
 		const glm::vec4 planeCoeffs = PhysicsSystem::getPlaneCoefficients(matrix);
 		const glm::vec3 objectOfTranslation = objectOf.transform.translation;
 		const float d = planeCoeffs.w 
-			- objectOfTranslation.x * planeCoeffs.x
-			- objectOfTranslation.y * planeCoeffs.y
-			- objectOfTranslation.z * planeCoeffs.z;
-		const float distance = abs(d) / sqrt(glm::dot(planeCoeffs, planeCoeffs));
-		//std::cout << "distance is: " << distance;
+			+ objectOfTranslation.x * planeCoeffs.x
+			+ objectOfTranslation.y * planeCoeffs.y
+			+ objectOfTranslation.z * planeCoeffs.z;
+		//std::cout << glm::to_string(planeCoeffs) << "\n";
+		//std::cout << glm::to_string(objectOfTranslation) << "\n";
+		const float distance = abs(d) / sqrt(
+			planeCoeffs.x * planeCoeffs.x +
+			planeCoeffs.y * planeCoeffs.y +
+			planeCoeffs.z * planeCoeffs.z);
+		//std::cout << "distance is: " << distance << "\n";
+		//std::cout << "sqrt of plane coeffs " << sqrt(glm::dot(planeCoeffs, planeCoeffs)) << "\n";
 		if (distance < objectOf.intersection.intersectionData[0]) {
 			return 1;
 		}

@@ -9,9 +9,9 @@ namespace appNamespace {
 	PhysicsSystem::PhysicsSystem()
 	{
 	}
-	void appNamespace::PhysicsSystem::updateState(const AppObject::Map& objectsVector, const int dt)
+	void appNamespace::PhysicsSystem::updateState(AppObject::Map& objectsVector, const int dt)
 	{
-		for (const auto& objectOf : objectsVector) {
+		for (auto& objectOf : objectsVector) {
 			//const auto& objectOfInfo = objectOf.second;
 			//std::cout << object.first << "\n";
 			//const auto& objectOfPosition = objectOfInfo.transform.translation;
@@ -24,9 +24,11 @@ namespace appNamespace {
 					if (isIt != -1) {
 						if (isIt == 0) {
 							std::cout << "no intersection" << "\n";
+							objectOf.second.isTarget = 0;
 						}
 						else if(isIt == 1) {
 							std::cout << "intersection" << "\n";
+							objectOf.second.isTarget = 1;
 						}
 						
 					}
@@ -47,8 +49,9 @@ namespace appNamespace {
 		const float d = 1.0f;
 		glm::mat3 matrixD = argMatrix;
 		const float D = glm::determinant(matrixD);
+		//std::cout <<"d equals to: " << D << "\n";
 		if (abs(D) < std::numeric_limits<float>::epsilon()) {
-			//SORT OF EXCEPTION THAT HANDLES HORIZONTAL CASE
+			//SORT OF EXCEPTION THAT HANDLES HORIZONTAL CASE AT ORIGIN
 			return  glm::vec4{
 				0.0f,
 				1.0f,
@@ -61,14 +64,14 @@ namespace appNamespace {
 		matrixA[2][0] = 1.0f;
 
 		glm::mat3 matrixB = argMatrix;
-		matrixA[0][1] = 1.0f;
-		matrixA[1][1] = 1.0f;
-		matrixA[2][1] = 1.0f;
+		matrixB[0][1] = 1.0f;
+		matrixB[1][1] = 1.0f;
+		matrixB[2][1] = 1.0f;
 
 		glm::mat3 matrixC = argMatrix;
-		matrixA[0][2] = 1.0f;
-		matrixA[1][2] = 1.0f;
-		matrixA[2][2] = 1.0f;
+		matrixC[0][2] = 1.0f;
+		matrixC[1][2] = 1.0f;
+		matrixC[2][2] = 1.0f;
 
 		const glm::vec4 equationCoeffs{
 			-d / D * glm::determinant(matrixA),

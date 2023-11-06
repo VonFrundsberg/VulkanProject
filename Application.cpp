@@ -179,16 +179,16 @@ namespace appNamespace {
                 grass.texture = this->_loadedTextures["grass"];
                 //-45
                 //grass.transform.translation = { -n*d/2 + d * i + 15*d , -50, -n * d/2 + d * j + 15*d};
-                grass.transform.translation = { 0, 0, 0};
+                grass.transform.translation = { 0, -10.0f, 0};
                 grass.transform.rotation = { 0.0, 0.0f, 0.0};
                 //house.transform.rotation = { 0.0, 0.0, 0.0f };
                 //house.transform.scale = { 0.5f, 0.5f, 0.5f };
                 grass.transform.scale = { 3.0f, 1.0f, 1.0f };
                 grass.intersection.setComponentData(IntersectionComponent::PLANE, {
-                    -3.0f, 0.0f, -1.0f,   // Point A
-                    3.0f, 0.0f, -1.0f,   // Point B
-                    3.0f, 0.0f, 1.0f,   // Point C
-                    -3.0f, 0.0f, 1.0f }    // Point D}
+                    -3.0f, -10.0f, -1.0f,   // Point A
+                    3.0f, -10.0f, -1.0f,   // Point B
+                    3.0f, -10.0f, 1.0f,   // Point C
+                    -3.0f, -10.0f, 1.0f }    // Point D}
                     );
                 appObjects.emplace(grass.getId(), std::move(grass));
             }

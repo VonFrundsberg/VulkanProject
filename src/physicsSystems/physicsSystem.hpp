@@ -11,7 +11,7 @@ namespace appNamespace {
 	public:
 		IntersectionSystem intersectionEngine;
 		PhysicsSystem();
-		void updateState(const AppObject::Map & objectsVector, const int dt);
+		void updateState(AppObject::Map & objectsVector, const int dt);
 		static glm::vec4 getPlaneCoefficients(const glm::mat3 & matrix);
 	private:
 		glm::vec4 getPlaneCoefficientsGauss(const glm::mat3& matrix);
