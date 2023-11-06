@@ -1,6 +1,7 @@
 #include "physicsSystem.hpp"
 #include "physicsSystem.hpp"
 #include "physicsSystem.hpp"
+#include "physicsSystem.hpp"
 #include <iostream>
 #include <gtx/string_cast.hpp>
 
@@ -20,7 +21,16 @@ namespace appNamespace {
 				//if (objectOfInfo.intersection.intersectionType == IntersectionComponent::PLANE) {
 				if (objectOf.first != objectWith.first) {
 					const auto isIt = intersectionEngine.isIntersected(objectOf.second, objectWith.second);
-					std::cout << "is intersected: " << isIt << "\n";
+					if (isIt != -1) {
+						if (isIt == 0) {
+							std::cout << "no intersection" << "\n";
+						}
+						else if(isIt == 1) {
+							std::cout << "intersection" << "\n";
+						}
+						
+					}
+					
 					
 				}
 			//}
@@ -32,29 +42,93 @@ namespace appNamespace {
 			//std::cout << objectInfo.intersection.intersectionData << "\n";
 		}
 	}
-	glm::vec4 appNamespace::PhysicsSystem::getPlaneCoordinates(const glm::mat3 & argMatrix)
+	glm::vec4 appNamespace::PhysicsSystem::getPlaneCoefficients(const glm::mat3& argMatrix)
+	{
+		const float d = 1.0f;
+		glm::mat3 matrixD = argMatrix;
+		const float D = glm::determinant(matrixD);
+		if (abs(D) < std::numeric_limits<float>::epsilon()) {
+			//SORT OF EXCEPTION THAT HANDLES HORIZONTAL CASE
+			return  glm::vec4{
+				0.0f,
+				1.0f,
+				0.0f,
+				0.0f};
+		}
+		glm::mat3 matrixA = argMatrix;
+		matrixA[0][0] = 1.0f;
+		matrixA[1][0] = 1.0f;
+		matrixA[2][0] = 1.0f;
+
+		glm::mat3 matrixB = argMatrix;
+		matrixA[0][1] = 1.0f;
+		matrixA[1][1] = 1.0f;
+		matrixA[2][1] = 1.0f;
+
+		glm::mat3 matrixC = argMatrix;
+		matrixA[0][2] = 1.0f;
+		matrixA[1][2] = 1.0f;
+		matrixA[2][2] = 1.0f;
+
+		const glm::vec4 equationCoeffs{
+			-d / D * glm::determinant(matrixA),
+			-d / D * glm::determinant(matrixB),
+			-d / D * glm::determinant(matrixC), d };
+		return equationCoeffs;
+	}
+	glm::vec4 appNamespace::PhysicsSystem::getPlaneCoefficientsGauss(const glm::mat3& argMatrix)
 	{
 		glm::mat3 matrix = argMatrix;
-		glm::vec3 rhs{ 1.0f };
-		for (int i = 0; i < 3; i++) {
-			for (int j = i + 1; j < 3; j++) {
+
+		const float d = 1.0f;
+		glm::vec3 rhs{ d };
+		glm::vec3 solution;
+		const int n = 3;
+		glm::mat3 permutation{ 1.0f };
+		//std::cout << glm::to_string(permutation) << "\n";
+		for (int i = 0; i < n; i++) {
+			/////PERMUTATION
+			int argMax = i;
+			float max = matrix[i][i];
+			for (int j = i + 1; j < n; j++) {
+				if (abs(matrix[i][j]) >= abs(max)) {
+					argMax = j;
+					max = matrix[i][j];
+				}
+			}
+			/*if (abs(max) < std::numeric_limits<float>::epsilon()) {
+				std::cout << "we have a problem";
+			}
+			permutation[i][i] = 0;
+			permutation[i][argMax] = 1;
+			permutation[argMax][argMax] = 0;
+			permutation[argMax][i] = 1;
+			std::cout << "result after sweep \n" << glm::to_string(matrix) << "\n";
+			matrix = permutation * matrix;
+			std::cout << i << "'s iteration \n permutation matrix \n" << glm::to_string(permutation) << "\n";
+			std::cout << "result after permutation \n" << glm::to_string(matrix) << "\n";*/
+			////FORWARD SWEEP
+			for (int j = i + 1; j < n; j++) {
 				matrix[i][j] /= matrix[i][i];
-				
 			}
 			rhs[i] /= matrix[i][i];
 			matrix[i][i] = 1.0f;
-
-			std::cout << "matrix: \n" << glm::to_string(matrix) << "\n";
-
-			for (int j = i + 1; j < 3; j++) {
-				for (int k = i; k < 3; k++) {
-					matrix[j][k] -= matrix[i][k] * matrix[i][j];
+			for (int j = i + 1; j < n; j++) {
+				for (int k = i + 1; k < n; k++) {
+					matrix[j][k] -= matrix[i][k] * matrix[j][i];
 				}
-				rhs[j] -= rhs[i] * matrix[i][j];
+				rhs[j] -= rhs[i] * matrix[j][i];
 				matrix[j][i] = 0.0f;
 			}
-			std::cout << "matrix: \n" << glm::to_string(matrix) << "\n";
 		}
-		return glm::vec4();
+		////BACKWARD SWEEP
+		for (int i = n - 1; i >= 0; i--) {
+			float sum = rhs[i];
+			for (int j = i + 1; j < n; j++) {
+				sum -= solution[j] * matrix[i][j];
+			}
+			solution[i] = sum;
+		}
+		return glm::vec4{ solution.x, solution.y, solution.z, d };
 	}
 }
